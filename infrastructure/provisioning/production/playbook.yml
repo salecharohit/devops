@@ -1,0 +1,35 @@
+---
+- name: Install Docker for Production environment
+  gather_facts: True
+  hosts: all
+  become: yes
+  
+  vars:
+    docker_insecure_registry_domain: "registry.local:5000"
+
+  tasks:
+  # In order to push docker images to insecure registry special configuration is required.
+  # https://docs.docker.com/registry/insecure/
+  - name: Configure Jenkins to Access insecure docker registry
+    template:
+      src: daemon.json
+      dest: "/etc/docker/daemon.json"
+      mode: 0777
+    register: docker_insecure_registry_access
+    when:
+      - docker_insecure_registry_domain | length > 0
+
+  - name: Immediately restart Docker for accessing insecure registry.
+    service: name=docker state=restarted
+    when: >
+      (docker_insecure_registry_access is defined and docker_insecure_registry_access.changed)
+
+  roles:
+    - role: provisioning/roles/geerlingguy.docker
+      become: yes
+      vars:
+        docker_users: [vagrant]
+    - role: provisioning/roles/geerlingguy.pip
+      vars: 
+        pip_install_packages:
+        - name: docker-py

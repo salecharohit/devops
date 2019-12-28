@@ -1,0 +1,44 @@
+---
+- name: Install Artifactory
+  gather_facts: True
+  hosts: all
+
+  vars:
+    artifactory_version: 6.9.6
+
+  tasks:
+    - name: Get Java Path for Setting in JAVA_HOME
+      shell : 'type -p javac|xargs readlink -f|xargs dirname|xargs dirname'
+      args:
+        executable: /bin/bash
+      register: JAVA_PATH
+
+    - name: Setting Java Environment Variable Globally
+      lineinfile: "dest=/etc/environment regexp=^JAVA_HOME= line=JAVA_HOME={{JAVA_PATH.stdout}}"
+      become: yes
+
+    - name: Source JAVA_HOME
+      shell : 'source /etc/environment'
+      args:
+        executable: /bin/bash    
+
+    - name: Install JFrog Artifactory Using deb
+      apt:
+         deb: https://jfrog.bintray.com/artifactory-debs/pool/main/j/jfrog-artifactory-oss-deb/jfrog-artifactory-oss-{{artifactory_version}}.deb
+      become: yes
+
+    - name: Starting and Enabling artifactory service
+      service:
+        name: artifactory
+        state: started
+        enabled: yes
+      changed_when: false
+      register: get_result
+      until: get_result is success
+      retries: 3
+      delay: 2        
+      become: yes 
+
+  roles:
+    - role: provisioning/roles/geerlingguy.java
+      become: yes

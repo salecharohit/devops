@@ -1,0 +1,19 @@
+[Unit]
+Description=vault service
+Requires=network-online.target
+After=network-online.target
+ConditionFileNotEmpty={{vault_config_directory}}/config.hcl
+ 
+[Service]
+EnvironmentFile=-/etc/sysconfig/vault
+Environment=GOMAXPROCS=2
+Restart=on-failure
+ExecStart=/usr/bin/vault server -config={{vault_config_directory}}/config.hcl
+StandardOutput={{vault_logs_directory}}/output.log
+StandardError={{vault_logs_directory}}/error.log
+LimitMEMLOCK=infinity
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGTERM
+ 
+[Install]
+WantedBy=multi-user.target

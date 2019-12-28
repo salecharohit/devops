@@ -1,0 +1,35 @@
+- name: Parse output of vault init
+  set_fact:
+    vault_init_parsed: "{{ vault_init_results.stdout | from_json }}"
+
+- name: Write unseal keys to files
+  copy:
+    dest: "{{ vault_config_directory }}/unseal_key_{{ item.0 }}"
+    content: "{{ item.1 }}"
+  with_indexed_items: "{{ vault_init_parsed.unseal_keys_hex }}"
+  delegate_to: localhost
+  become: yes 
+
+- name: Write root token to file
+  copy:
+    content: "{{ vault_init_parsed.root_token }}"
+    dest: "{{vault_config_directory}}/rootkey"
+  delegate_to: localhost
+  become: yes 
+
+- name: Write root token to file
+  copy:
+    content: "{{ vault_init_parsed.root_token }}"
+    dest: "{{vault_config_directory}}/rootkey"
+  become: yes 
+
+#Copy vault_unseal.sh so that everytime system reboots the vault is unsealed by default.
+- name: Copy vault_unseal.sh to profile.d
+  template:
+    src: vault_unseal.sh
+    dest: /etc/profile.d/
+    owner: root
+    group: root
+    mode: a+x
+  become: yes
+       

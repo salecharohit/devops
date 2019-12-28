@@ -1,0 +1,8 @@
+---
+- name: Setup a Hashicorp Vault Server
+  gather_facts: True
+  hosts: all
+
+#https://github.com/MiteshSharma/AnsibleVaultRole
+  roles:
+    - role: provisioning/roles/hashicorp-vault

@@ -1,0 +1,38 @@
+---
+- name: Install Docker Registry
+  hosts: all #localhost
+  #connection: local
+  become: yes
+#https://github.com/freedomofpress/ansible-role-docker-registry
+  vars:
+    docker_registry_data_directory: /var/www/docker-registry
+    docker_registry_expose_port: 5000
+
+  tasks:
+    - name: Create Docker registry docroot.
+      file:
+        state: directory
+        path: "{{ docker_registry_data_directory }}"
+        mode: "0755"
+
+    - name: Run docker registry container
+      docker_container:
+        exposed_ports: "{{ docker_registry_expose_port }}"
+        image: "registry:2"
+        name: "registry"
+        ports: "{{ docker_registry_expose_port }}:{{ docker_registry_expose_port }}"
+        volumes:
+          - "{{ docker_registry_data_directory }}:{{ docker_registry_data_directory }}"
+        pull: "no"
+        restart_policy: "always"
+        state: "started"
+        env:
+          REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: "{{ docker_registry_data_directory }}"
+
+  roles:
+  - role: provisioning/roles/geerlingguy.docker
+    become: yes         
+  - role: provisioning/roles/geerlingguy.pip
+    vars: 
+      pip_install_packages:
+      - name: docker-py

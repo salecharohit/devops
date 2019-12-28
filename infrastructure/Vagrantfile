@@ -1,0 +1,88 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION = "2"
+#bionic will by default take disksize of 10GB minimum for each VM.
+cluster = {
+  "vault.local" => { :ip => "192.168.33.10", :cpus => 1, :mem => 512,
+  :provision => "ansible",:playbook =>"provisioning/vault/playbook.yml",:size => "10GB"},  
+  "registry.local" => { :ip => "192.168.33.11", :cpus => 1, :mem => 512,
+  :provision => "ansible",:playbook =>"provisioning/registry/playbook.yml",:size => "10GB"},
+  "staging.local" => { :ip => "192.168.33.12", :cpus => 1, :mem => 512,
+  :provision => "ansible",:playbook =>"provisioning/staging/playbook.yml",:size => "10GB"},
+  "production.local" => { :ip => "192.168.33.13", :cpus => 1, :mem => 512,
+  :provision => "ansible",:playbook =>"provisioning/production/playbook.yml",:size => "10GB"},
+  "jenkins.local" => { :ip => "192.168.33.14", :cpus => 2, :mem => 2048,
+  :provision => "ansible",:playbook =>"provisioning/jenkins/playbook.yml",:size => "10GB"}
+  # "artifactory.local" => { :ip => "192.168.33.15", :cpus => 1, :mem => 2048,
+  # :provision => "ansible",:playbook =>"provisioning/artifactory/playbook.yml",:size => "10GB"}
+}
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+# Check for missing plugins
+  required_plugins = %w(vagrant-disksize vagrant-hostmanager vagrant-vbguest)
+  plugin_installed = false
+  required_plugins.each do |plugin|
+    unless Vagrant.has_plugin?(plugin)
+      puts "Installing #{plugin} plugin"
+      system "vagrant plugin install #{plugin}"
+      plugin_installed = true
+    end
+  end
+
+  unless Vagrant.has_plugin?("vagrant-cachier")
+    ##cachier has issues with Windows
+    if !Vagrant::Util::Platform.windows? then
+      puts "Installing vagrant-cachier plugin"
+      system "vagrant plugin install vagrant-cachier"
+      plugin_installed = true
+    end
+  end
+  
+  # If new plugins installed, restart Vagrant process
+  if plugin_installed === true
+    exec "vagrant #{ARGV.join' '}"
+  end
+
+    config.hostmanager.enabled = true
+    config.hostmanager.manage_host = true
+    config.hostmanager.manage_guest = true
+    config.hostmanager.include_offline= true
+    config.hostmanager.ignore_private_ip = false
+
+    config.vm.box_check_update = false
+    config.vbguest.auto_update = false
+
+  if !Vagrant::Util::Platform.windows? then
+    config.cache.scope = :box
+    config.cache.synced_folder_opts = {
+      type: :nfs,
+      mount_options: ['rw', 'vers=3', 'tcp', 'nolock']
+    }
+  end
+
+  cluster.each_with_index do |(hostname, info), index|
+
+    config.vm.define hostname do |cfg|
+      cfg.vm.provider :virtualbox do |vb, override|
+        config.vm.box = "ubuntu/bionic64"
+        override.vm.network :private_network, ip: "#{info[:ip]}"
+        override.vm.hostname = hostname
+        if Vagrant.has_plugin?("vagrant-disksize")
+          override.disksize.size = "#{info[:size]}"
+        end
+        vb.name = hostname 
+        vb.gui = false
+        if "#{info[:provision]}" == "ansible"
+          override.vm.provision "ansible_local" do |ansible|
+              ansible.playbook = "#{info[:playbook]}"
+              ansible.verbose = "True"
+          end
+        end
+        vb.customize ["modifyvm", :id, "--memory", info[:mem], "--cpus", info[:cpus], "--hwvirtex", "on","--groups", "/DevOps-Lab",
+        "--natdnshostresolver1", "on", "--cableconnected1", "on"]
+      end # end provider
+    end # end config
+
+  end # end cluster
+end

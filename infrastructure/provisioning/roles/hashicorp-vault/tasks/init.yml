@@ -1,0 +1,50 @@
+- name: Copy the config file
+  template:
+    src: config.hcl
+    dest: "{{ vault_config_directory }}"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+  become: yes      
+
+- name: Copy systemd init file
+  template:
+    src: vault.service
+    dest: /etc/systemd/system/vault.service
+    owner: root
+    group: root
+  notify: systemd_reload
+  become: yes
+
+- name: Setting VAULT_ADDR Environment Variable Globally
+  lineinfile: "dest=/etc/environment regexp=^VAULT_ADDR= line=VAULT_ADDR=http://127.0.0.1:8200"
+  become: yes
+
+- name: Source /etc/environment
+  shell : 'source /etc/environment'
+  args:
+    executable: /bin/bash    
+
+- name: Starting and Enabling vault service
+  service:
+    name: vault
+    state: started
+    enabled: yes
+  changed_when: false
+  register: get_result
+  until: get_result is success
+  retries: 3
+  delay: 2        
+  become: yes        
+
+- name: Wait for port Vault port 8200 to start before executing init
+  wait_for:
+    port: 8200
+    delay: 10
+
+- name: Initialise Vault operator
+  shell: 'vault operator init -format json'
+  register: vault_init_results
+  environment:
+    VAULT_ADDR: "http://127.0.0.1:8200"
+  args:
+    executable: /bin/bash 

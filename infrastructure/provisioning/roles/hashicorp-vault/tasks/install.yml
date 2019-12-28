@@ -1,0 +1,80 @@
+## Vault Installation
+- name: Creating vault user group
+  group: 
+    name: "{{ vault_group }}"
+  become: yes
+
+- name: Creating vault user
+  user:
+    name: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    system: yes
+    shell: "/sbin/nologin"
+    comment: "vault nologin User"
+    createhome: "no"
+    state: present
+  become: yes        
+
+- name: Install prerequisites
+  package:
+    name: "{{ item }}"
+    update_cache: yes
+  with_items:
+      - unzip
+  become: yes
+
+- name: Create Vault Data Directory
+  file:
+    path: "{{ vault_data_directory }}"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    state: directory
+  become: yes
+
+- name: Create Vault Logs Directory
+  file:
+    path: "{{ vault_logs_directory }}"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    state: directory
+  become: yes
+
+- name: Create Vault Config Directory
+  file:
+    path: "{{ vault_config_directory }}"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    state: directory
+  become: yes
+
+- name: Download Vault
+  get_url:
+    url: https://releases.hashicorp.com/vault/{{vault_version}}/vault_{{vault_version}}_linux_amd64.zip
+    dest: /tmp/vault_{{vault_version}}_linux_amd64.zip
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: 0755
+    checksum: "{{vault_checksum}}"
+  register: vault_download
+  become: yes
+  changed_when: false
+  until: vault_download is success
+  retries: 3
+  delay: 2
+
+- name: "Unzip vault archive"
+  unarchive:
+    src: "{{ vault_download.dest }}"
+    dest: /usr/bin
+    copy: no
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: 0755
+  become: yes     
+
+- name: "Set vault binary capabilities"
+  capabilities:
+    path: /usr/bin/vault
+    capability: cap_ipc_lock+ep
+    state: present
+  become: yes

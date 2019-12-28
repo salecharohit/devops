@@ -1,0 +1,29 @@
+---
+# Maven version number
+maven_version: '3.6.3'
+
+# Mirror to download the Maven redistributable package from
+maven_mirror: "http://archive.apache.org/dist/maven/maven-{{ maven_version|regex_replace('\\..*', '') }}/{{ maven_version }}/binaries"
+
+# Base installation directory the Maven distribution
+maven_install_dir: /opt/maven
+
+# Directory to store files downloaded for Maven installation
+maven_download_dir: "{{ x_ansible_download_dir | default(ansible_env.HOME + '/.ansible/tmp/downloads') }}"
+
+# The number of seconds to wait before the Maven download times-out
+maven_download_timeout: 10
+
+# If this is the default installation, symbolic links to mvn and mvnDebug will
+# be created in /usr/local/bin
+maven_is_default_installation: yes
+
+# Name of the group of Ansible facts relating this Maven installation.
+#
+# Override if you want use this role more than once to install multiple versions
+# of Maven.
+#
+# e.g. maven_fact_group_name: maven_3_3
+# would change the Maven home fact to:
+# ansible_local.maven_3_2.general.home
+maven_fact_group_name: maven

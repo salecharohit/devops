@@ -1,0 +1,28 @@
+---
+dependency:
+  name: galaxy
+
+driver:
+  name: docker
+
+lint:
+  name: yamllint
+
+platforms:
+  - name: ansible-role-maven-centos-min
+    image: centos:6
+    dockerfile: ../default/Dockerfile.j2
+
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+
+scenario:
+  name: centos-min
+
+verifier:
+  name: testinfra
+  directory: ../single/tests
+  lint:
+    name: flake8
