@@ -1,0 +1,7 @@
+---
+# vars file for role-mailcatcher
+ruby_package_name: ruby
+ruby_gem_bin: /usr/bin/gem
+
+mailcatcher_service_template: mailcatcher.service.j2
+mailcatcher_service_target: /etc/systemd/system/mailcatcher.service

@@ -1,0 +1,7 @@
+---
+# host to test against
+- hosts: test-kitchen
+  remote_user: root
+
+  roles:
+    - role: ansible-role-mailcatcher

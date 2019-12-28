@@ -1,0 +1,6 @@
+---
+ruby_package_name: ruby2.0
+ruby_gem_bin: /usr/bin/gem2.0
+
+mailcatcher_service_template: mailcatcher.j2
+mailcatcher_service_target: /etc/init/mailcatcher.conf

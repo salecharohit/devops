@@ -1,0 +1,6 @@
+---
+- name: Create mailcatcher group
+  group: name=mailcatcher
+
+- name: Create Mailcatcher user
+  user: name=mailcatcher shell=/bin/bash comment="Mailcatcher" group=mailcatcher

@@ -1,0 +1,8 @@
+---
+- name: Install Mailcatcher
+  gather_facts: True
+  hosts: all
+
+  roles:
+  - role: provisioning/roles/ansible-role-mailcatcher
+    become: yes

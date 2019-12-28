@@ -1,6 +1,7 @@
 - name: Parse output of vault init
   set_fact:
     vault_init_parsed: "{{ vault_init_results.stdout | from_json }}"
+  when: stat_result.stat.exists == False 
 
 - name: Write unseal keys to files
   copy:
@@ -9,6 +10,7 @@
   with_indexed_items: "{{ vault_init_parsed.unseal_keys_hex }}"
   delegate_to: localhost
   become: yes 
+  when: stat_result.stat.exists == False 
 
 - name: Write root token to file
   copy:
@@ -16,12 +18,14 @@
     dest: "{{vault_config_directory}}/rootkey"
   delegate_to: localhost
   become: yes 
+  when: stat_result.stat.exists == False 
 
 - name: Write root token to file
   copy:
     content: "{{ vault_init_parsed.root_token }}"
     dest: "{{vault_config_directory}}/rootkey"
   become: yes 
+  when: stat_result.stat.exists == False 
 
 #Copy vault_unseal.sh so that everytime system reboots the vault is unsealed by default.
 - name: Copy vault_unseal.sh to profile.d
@@ -32,4 +36,5 @@
     group: root
     mode: a+x
   become: yes
+  when: stat_result.stat.exists == False 
        

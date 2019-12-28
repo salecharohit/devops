@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  author: "Stephan Hochhaus"
+  description: Set up Mailcatcher
+  company: Freelance
+  license: BSD
+  min_ansible_version: 1.4
+  platforms:
+    - name: Ubuntu
+      versions:
+        - saucy
+        - precise
+        - trusty
+  categories:
+   - development

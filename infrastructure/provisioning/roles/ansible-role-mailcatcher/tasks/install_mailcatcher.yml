@@ -1,0 +1,45 @@
+- include_vars: "{{ item }}"
+  with_first_found:
+    - "../vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version | int}}.yml"
+    - "../vars/{{ ansible_distribution }}.yml"
+    - "../vars/{{ ansible_os_family }}.yml"
+    - "../vars/main.yml"
+
+- name: Install mailcatcher dependencies
+  apt:
+    state: present
+    name:
+      - build-essential
+      - sqlite3
+      - libsqlite3-dev
+      - "{{ ruby_package_name }}"
+      - "{{ ruby_package_name}}-dev"
+
+- name: LogFolder permissions
+  file:
+    path: /var/log/mailcatcher
+    owner: mailcatcher
+    group: mailcatcher
+    state: directory
+
+- name: Install Mailcatcher
+  command: "{{ ruby_gem_bin }} install mailcatcher --no-rdoc --no-ri"
+
+- name: Copy systemd init file
+  template:
+    src: mailcatcher.service.j2
+    dest: /etc/systemd/system/mailcatcher.service
+    owner: root
+    group: root
+  notify: systemd_reload
+
+- name: Starting and Enabling Mailcatcher
+  service:
+    name: mailcatcher
+    state: started
+    enabled: yes
+  changed_when: false
+  register: get_result
+  until: get_result is success
+  retries: 3
+  delay: 2

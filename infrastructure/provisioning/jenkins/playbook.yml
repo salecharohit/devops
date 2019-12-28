@@ -91,3 +91,8 @@
       vars:
         docker_users: ["{{ jenkins_process_user }}","vagrant"]
     - role: provisioning/roles/ansible-role-maven
+    - role: provisioning/roles/geerlingguy.nodejs
+      become: yes
+      vars:
+        nodejs_version: "12.x"
+        nodejs_npm_global_packages: [rimraf,mkdirp,copyfiles]

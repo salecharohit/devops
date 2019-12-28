@@ -41,6 +41,11 @@
     port: 8200
     delay: 10
 
+- name: Check that the rootkey file exists, if it does donot run vault operator init.
+  stat:
+    path: "{{ vault_config_directory }}/rootkey"
+  register: stat_result
+
 - name: Initialise Vault operator
   shell: 'vault operator init -format json'
   register: vault_init_results
@@ -48,3 +53,4 @@
     VAULT_ADDR: "http://127.0.0.1:8200"
   args:
     executable: /bin/bash 
+  when: stat_result.stat.exists == False 
