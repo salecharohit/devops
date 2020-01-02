@@ -21,47 +21,36 @@ cluster = {
 }
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  
 # Check for missing plugins
-  required_plugins = %w(vagrant-disksize vagrant-hostmanager vagrant-vbguest)
+  required_plugins = %w(vagrant-disksize vagrant-hostmanager vagrant-vbguest vagrant-winnfsd vagrant-cachier )
   plugin_installed = false
   required_plugins.each do |plugin|
     unless Vagrant.has_plugin?(plugin)
-      puts "Installing #{plugin} plugin"
       system "vagrant plugin install #{plugin}"
       plugin_installed = true
     end
   end
 
-  unless Vagrant.has_plugin?("vagrant-cachier")
-    ##cachier has issues with Windows
-    if !Vagrant::Util::Platform.windows? then
-      puts "Installing vagrant-cachier plugin"
-      system "vagrant plugin install vagrant-cachier"
-      plugin_installed = true
-    end
-  end
-  
   # If new plugins installed, restart Vagrant process
   if plugin_installed === true
     exec "vagrant #{ARGV.join' '}"
   end
 
-    config.hostmanager.enabled = true
-    config.hostmanager.manage_host = true
-    config.hostmanager.manage_guest = true
-    config.hostmanager.include_offline= true
-    config.hostmanager.ignore_private_ip = false
+  config.hostmanager.enabled = true
+  config.hostmanager.manage_host = true
+  config.hostmanager.manage_guest = true
+  config.hostmanager.include_offline= true
+  config.hostmanager.ignore_private_ip = false
 
-    config.vm.box_check_update = false
-    config.vbguest.auto_update = false
+  config.vm.box_check_update = false
+  config.vbguest.auto_update = false
 
-  if !Vagrant::Util::Platform.windows? then
-    config.cache.scope = :box
-    config.cache.synced_folder_opts = {
-      type: :nfs,
-      mount_options: ['rw', 'vers=3', 'tcp', 'nolock']
-    }
-  end
+  config.cache.scope = :box
+  config.cache.synced_folder_opts = {
+    type: :nfs,
+    mount_options: ['rw', 'vers=3', 'tcp', 'nolock']
+  }
 
   cluster.each_with_index do |(hostname, info), index|
 
@@ -70,9 +59,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         config.vm.box = "ubuntu/bionic64"
         override.vm.network :private_network, ip: "#{info[:ip]}"
         override.vm.hostname = hostname
-        if Vagrant.has_plugin?("vagrant-disksize")
-          override.disksize.size = "#{info[:size]}"
-        end
+        override.disksize.size = "#{info[:size]}"
         vb.name = hostname 
         vb.gui = false
         if "#{info[:provision]}" == "ansible"
