@@ -31,8 +31,11 @@
 
   roles:
   - role: provisioning/roles/geerlingguy.docker
+    vars:
+      docker_users: ["vagrant"]    
     become: yes         
   - role: provisioning/roles/geerlingguy.pip
+    become: yes
     vars: 
       pip_install_packages:
       - name: docker-py
