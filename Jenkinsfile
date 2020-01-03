@@ -10,9 +10,11 @@ pipeline {
       }
       stage('Archive') {
          steps {
+         sh '''
+               export COMMIT_ID=`cat .git/HEAD`
+               sudo cp ${WORKSPACE}/target/*.jar ${WORKSPACE}/target/${COMMIT_ID}.war
+            '''            
             script {
-                export COMMIT_ID=`cat .git/HEAD`
-                sudo cp ${WORKSPACE}/target/devops*.jar ${WORKSPACE}/target/${COMMIT_ID}.jar               
                 def remote = [:]
                 remote.name = 'archiver'
                 remote.user = 'vagrant'
