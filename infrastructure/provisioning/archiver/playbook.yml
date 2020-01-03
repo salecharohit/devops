@@ -1,52 +1,17 @@
 ---
-- name: Install Artifactory
+- name: Creating a server for storing archives
   gather_facts: True
   hosts: all
 
   vars:
-    artifactory_data_directory: /opt/artifactory
-    artifactory_image: goodrainapps/artifactory-oss
-    artifactory_expose_port: 8080
+    artifactory_data_directory: /home/vagrant/
 
   tasks:
-  - name: restart docker
-    service: 
-      name: docker
-      state: restarted
-    become: yes        
-
-  - name: Create Artifactory Data Directory.
+  - name: Create a directory for storing archives
     file:
       state: directory
       path: "{{ artifactory_data_directory }}"
-      mode: "0755"
-    become: yes  
-
-  - name: Run Artifactory Container
-    docker_container:
-      exposed_ports: "{{ artifactory_expose_port }}"
-      image: "{{ artifactory_image }}"
-      name: "artifactory"
-      ports: "{{ artifactory_expose_port }}:{{ artifactory_expose_port }}"
-      volumes:
-        - "{{ artifactory_data_directory }}:{{ artifactory_data_directory }}"
-      pull: "no"
-      restart_policy: "always"
-      state: "started"
-      env:
-        REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: "{{ artifactory_data_directory }}"
-
-  roles:
-  - role: provisioning/roles/geerlingguy.docker
-    become: yes
-    vars:
-      docker_users: ["vagrant"]         
-  - role: provisioning/roles/geerlingguy.pip
-    become: yes  
-    vars: 
-      pip_install_packages:
-      - name: docker-py
-
+      mode: "0777"
 
   # Below code can be used to install the latest version of artifactory however it takes considerable amount of RAM atleast 2 GB 
   # Uncomment below and comment everything upto vars in order to use latest version of artifactory
