@@ -82,14 +82,11 @@
           - git # Installs Credentials and SSH credentials plugins
           - ssh
           - ws-cleanup
-          - build-timeout
           - timestamper
           - credentials-binding
           - role-strategy
           - ansicolor
-          - matrix-auth
           - workflow-aggregator
-          - extended-read-permission
           - email-ext
           - blueocean
           - mailer
@@ -104,4 +101,4 @@
       become: yes
       vars:
         nodejs_version: "12.x"
-        nodejs_npm_global_packages: ["rimraf","mkdirp","copyfiles","@angular/cli"]
+        nodejs_npm_global_packages: ["rimraf","mkdirp","copyfiles","@angular/cli","@angular-devkit/build-angular","@angular/compiler-cli"]
