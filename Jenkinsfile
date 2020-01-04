@@ -24,7 +24,7 @@ pipeline {
                 remote.allowAnyHosts = true
                 remote.host = 'archiver.local'
                 remote.identityFile = '~/.ssh/archiver.key'
-                    sshPut remote: remote, from: '${COMMIT_ID}.jar', into: '/home/vagrant/'
+                    sshPut remote: remote, from: ${COMMIT_ID}.jar, into: '/home/vagrant/'
             }
          }
       }   
