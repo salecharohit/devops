@@ -30,13 +30,24 @@
       when: >
         (docker_insecure_registry_access is defined and docker_insecure_registry_access.changed)
 
-    - name: Recursively change ownership of a directory
+    - name: Create a .ssh Directory before copying Keys
       file:
         path: "{{jenkins_home}}/.ssh"
         state: directory
         recurse: yes
         owner: "{{ jenkins_process_user }}"
+        group: "{{ jenkins_process_group }}"    
+
+#This is a very important step as the files being downloaded in workspace cease to take Jenkin's users permissions.
+# sudo chown -R jenkins:jenkins /var/lib/jenkins/
+    - name: Recursively Apply Permissions for Jenkins user in the jenkins home folder
+      file:
+        path: "{{jenkins_home}}"
+        state: directory
+        recurse: yes
+        owner: "{{ jenkins_process_user }}"
         group: "{{ jenkins_process_group }}"
+      become: yes         
 
     - name: Copy Private SSH Key of Staging Server for SSH Access
       copy:
@@ -101,4 +112,3 @@
       become: yes
       vars:
         nodejs_version: "12.x"
-        nodejs_npm_global_packages: ["rimraf","mkdirp","copyfiles","@angular/cli","@angular-devkit/build-angular","@angular/compiler-cli"]
