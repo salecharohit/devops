@@ -112,3 +112,4 @@
       become: yes
       vars:
         nodejs_version: "12.x"
+        nodejs_npm_global_packages: ["rimraf","mkdirp","copyfiles"]

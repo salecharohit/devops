@@ -8,6 +8,7 @@ pipeline {
                npm --prefix src/main/frontend install
                npm --prefix src/main/frontend run build
                mvn package
+               ls -al
             '''
          }
       }
@@ -24,7 +25,7 @@ pipeline {
                 remote.allowAnyHosts = true
                 remote.host = 'archiver.local'
                 remote.identityFile = '~/.ssh/archiver.key'
-                    sshPut remote: remote, filterRegex: '*.jar',from: '.' ,into: '/home/vagrant/'
+                    sshPut remote: remote, filterRegex: '.jar$',from: './target' ,into: '/home/vagrant/archiver'
             }
          }
       }   
