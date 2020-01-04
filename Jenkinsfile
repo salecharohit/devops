@@ -15,7 +15,7 @@ pipeline {
          steps {
          sh '''
                export COMMIT_ID=`cat .git/HEAD`
-               sudo cp ${WORKSPACE}/target/*.jar ${WORKSPACE}/target/${COMMIT_ID}.war
+               cp ${WORKSPACE}/target/*.jar ${WORKSPACE}/target/${COMMIT_ID}.war
             '''            
             script {
                 def remote = [:]
