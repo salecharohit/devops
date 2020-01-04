@@ -8,16 +8,15 @@ pipeline {
                npm --prefix src/main/frontend install
                npm --prefix src/main/frontend run build
                mvn package
-               ls -al
             '''
          }
       }
       stage('Archive') {
          steps {
-         sh '''
-               export COMMIT_ID=`cat .git/HEAD`
-               mv ${WORKSPACE}/target/*.jar ${WORKSPACE}/target/${COMMIT_ID}.jar
-            '''            
+            sh '''
+                  export COMMIT_ID=`cat .git/HEAD`
+                  mv ${WORKSPACE}/target/*.jar ${WORKSPACE}/target/${COMMIT_ID}.jar
+               '''            
             script {
                 def remote = [:]
                 remote.name = 'archiver'
