@@ -4,7 +4,10 @@ pipeline {
       stage('Build') {
          steps {
             sh '''
-               mvn clean && npm --prefix src/main/frontend run build && mvn package
+               mvn clean
+               npm --prefix src/main/frontend install
+               npm --prefix src/main/frontend run build
+               mvn package
             '''
          }
       }
