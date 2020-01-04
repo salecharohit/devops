@@ -5,7 +5,7 @@ pipeline {
          steps {
             sh '''
                mvn clean
-               npm --prefix src/main/frontend install
+               sudo npm --prefix src/main/frontend install
                npm --prefix src/main/frontend run build
                mvn package
             '''
