@@ -24,7 +24,7 @@ pipeline {
                 remote.allowAnyHosts = true
                 remote.host = 'archiver.local'
                 remote.identityFile = '~/.ssh/archiver.key'
-                    sshPut remote: remote, filterRegex: '*.jar', into: '/home/vagrant/'
+                    sshPut remote: remote, filterRegex: '*.jar',from: '.' ,into: '/home/vagrant/'
             }
          }
       }   
