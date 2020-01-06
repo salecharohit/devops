@@ -8,6 +8,7 @@ pipeline {
                npm --prefix src/main/frontend install
                npm --prefix src/main/frontend run build
                mvn package
+               ls -al target
             '''
          }
       }
@@ -27,6 +28,31 @@ pipeline {
                     sshPut remote: remote, filterRegex: '.jar$',from: './target' ,into: '/home/vagrant/archiver'
             }
          }
-      }   
+      }
+      stage('Docker Build') {
+      steps {
+         parallel(
+            app: {
+               echo "This is branch a"
+            },
+            db: {
+               echo "This is branch b"
+            }
+         )
+      }
+      }         
    }
+    post {
+    failure {
+      script {
+        currentBuild.result = 'FAILURE'
+      }
+    }
+    always {
+          step([$class: 'Mailer',
+          notifyEveryUnstableBuild: true,
+          recipients: "build-failed@devops.local",
+          sendToIndividuals: true])
+    }
+  }
 }
