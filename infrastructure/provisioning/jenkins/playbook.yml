@@ -95,7 +95,6 @@
           - ws-cleanup
           - timestamper
           - credentials-binding
-          - role-strategy
           - ansicolor
           - workflow-aggregator
           - email-ext
