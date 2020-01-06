@@ -14,10 +14,12 @@ pipeline {
       }
       stage('Archive') {
          steps {
-            COMMIT_ID = sh (
-                  script: "cat .git/HEAD",
-                  returnStdout: true
-            ).trim()             
+            script{
+               COMMIT_ID = sh (
+                     script: "cat .git/HEAD",
+                     returnStdout: true
+               ).trim()
+            }         
             sh '''
                   // export COMMIT_ID=`cat .git/HEAD`
                   mv ${WORKSPACE}/target/*.jar ${WORKSPACE}/target/${COMMIT_ID}.jar
