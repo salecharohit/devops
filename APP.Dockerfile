@@ -5,5 +5,5 @@ RUN adduser -D -h /home/boot -s /bin/ash boot -G boot
 USER boot
 WORKDIR /home/boot
 ADD target/$FILE_NAME.jar devops.jar
-EXPOSE 80
+EXPOSE 8080
 CMD java -jar devops.jar
