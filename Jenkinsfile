@@ -1,4 +1,4 @@
-def COMMIT_ID
+def app
 pipeline {
    agent any
    stages {
@@ -13,16 +13,9 @@ pipeline {
          }
       }
       stage('Archive') {
-         steps {
-            script{
-               COMMIT_ID = sh (
-                     script: "cat .git/HEAD",
-                     returnStdout: true
-               ).trim()
-            }         
+         steps {    
             sh '''
-                  // export COMMIT_ID=`cat .git/HEAD`
-                  mv ${WORKSPACE}/target/*.jar ${WORKSPACE}/target/${COMMIT_ID}.jar
+                  mv ${WORKSPACE}/target/*.jar ${WORKSPACE}/target/${GIT_COMMIT}.jar
                '''            
             script {
                 def remote = [:]
@@ -39,10 +32,7 @@ pipeline {
       steps {
          parallel(
             app: {
-               sh '''
-                     
-                     docker build --build-arg user=what_user .
-                  '''
+               app = docker.build("devops/app","file_name=${GIT_COMMIT}")
             },
             db: {
                echo "This is branch b"

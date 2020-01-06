@@ -3,6 +3,6 @@ RUN addgroup boot
 RUN adduser -D -h /home/boot -s /bin/ash boot -G boot
 USER boot
 WORKDIR /home/boot
-ADD target/$jar devops.jar
+ADD target/$file_name devops.jar
 EXPOSE 80
 CMD java -jar devops.jar
