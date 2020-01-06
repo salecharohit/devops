@@ -32,12 +32,13 @@ pipeline {
             }
          }
       }
-      stage('Docker Build') {
+      stage('Setup Staging') {
       steps {
          parallel(
             app: {
                   sh '''
-                        docker build --build-arg file_name=${GIT_COMMIT} -t devops/app -f APP.Dockerfile .
+                        docker build --build-arg file_name=${GIT_COMMIT} -t "${registry}:${BUILD_NUMBER}" -f APP.Dockerfile .
+                        
                      '''
             },
             db: {
