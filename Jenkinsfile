@@ -1,7 +1,6 @@
 pipeline {
    agent any
    environment {
-     BUILD_VERSION = ""
      APP = ""
      registry = "registry.local:5000/devops"
    }
@@ -20,8 +19,7 @@ pipeline {
          steps {
             
             sh '''
-                  export BUILD_VERSION = ${env.BUILD_NUMBER}_${GIT_COMMIT}
-                  mv ${WORKSPACE}/target/*.jar ${WORKSPACE}/target/${BUILD_VERSION}.jar
+                  mv ${WORKSPACE}/target/*.jar ${WORKSPACE}/target/${GIT_COMMIT}.jar
                '''            
             script {
                 def remote = [:]
@@ -39,8 +37,7 @@ pipeline {
          parallel(
             app: {
                   sh '''
-                        export BUILD_VERSION = ${env.BUILD_NUMBER}_${GIT_COMMIT}
-                        docker build devops/app -f APP.Dockerfile --build-arg file_name="${BUILD_VERSION}" .
+                        docker build --build-arg file_name=${GIT_COMMIT} -t devops/app -f APP.Dockerfile .
                      '''
             },
             db: {
