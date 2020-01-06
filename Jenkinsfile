@@ -1,3 +1,4 @@
+def COMMIT_ID
 pipeline {
    agent any
    stages {
@@ -8,14 +9,17 @@ pipeline {
                npm --prefix src/main/frontend install
                npm --prefix src/main/frontend run build
                mvn package
-               ls -al target
             '''
          }
       }
       stage('Archive') {
          steps {
+            COMMIT_ID = sh (
+                  script: "cat .git/HEAD",
+                  returnStdout: true
+            ).trim()             
             sh '''
-                  export COMMIT_ID=`cat .git/HEAD`
+                  // export COMMIT_ID=`cat .git/HEAD`
                   mv ${WORKSPACE}/target/*.jar ${WORKSPACE}/target/${COMMIT_ID}.jar
                '''            
             script {
@@ -33,7 +37,10 @@ pipeline {
       steps {
          parallel(
             app: {
-               echo "This is branch a"
+               sh '''
+                     
+                     docker build --build-arg user=what_user .
+                  '''
             },
             db: {
                echo "This is branch b"
