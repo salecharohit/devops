@@ -2,7 +2,7 @@ pipeline {
    agent any
    environment {
      APP = ""
-     registry = "registry.local:5000/devops"
+     REGISTRY = "registry.local:5000"
    }
    stages {
       stage('Build') {
@@ -37,8 +37,10 @@ pipeline {
          parallel(
             app: {
                   sh '''
-                        docker build --build-arg file_name=${GIT_COMMIT} -t "${registry}:${BUILD_NUMBER}" -f APP.Dockerfile .
-                        
+                        docker build --build-arg FILE_NAME=${GIT_COMMIT} -t "devops/app:${BUILD_NUMBER}" -f APP.Dockerfile .
+                        docker tag "devops/app:${BUILD_NUMBER}" "${REGISTRY}/devops/app:${BUILD_NUMBER}"
+                        docker push "${REGISTRY}/devops/app:${BUILD_NUMBER}"
+                        docker rmi "devops/app:${BUILD_NUMBER}"
                      '''
             },
             db: {
