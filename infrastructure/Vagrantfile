@@ -8,9 +8,9 @@ cluster = {
   :provision => "ansible",:playbook =>"provisioning/vault/playbook.yml",:size => "10GB"},  
   "registry.local" => { :ip => "192.168.33.11", :cpus => 1, :mem => 512,
   :provision => "ansible",:playbook =>"provisioning/registry/playbook.yml",:size => "10GB"},
-  "staging.local" => { :ip => "192.168.33.12", :cpus => 1, :mem => 1024,
+  "staging.local" => { :ip => "192.168.33.12", :cpus => 1, :mem => 512,
   :provision => "ansible",:playbook =>"provisioning/staging/playbook.yml",:size => "10GB"},
-  "production.local" => { :ip => "192.168.33.13", :cpus => 1, :mem => 1024,
+  "production.local" => { :ip => "192.168.33.13", :cpus => 1, :mem => 512,
   :provision => "ansible",:playbook =>"provisioning/production/playbook.yml",:size => "10GB"},
   "archiver.local" => { :ip => "192.168.33.16", :cpus => 1, :mem => 256,
   :provision => "ansible",:playbook =>"provisioning/archiver/playbook.yml",:size => "10GB"},
@@ -27,7 +27,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   plugin_installed = false
   required_plugins.each do |plugin|
     unless Vagrant.has_plugin?(plugin)
-      system "vagrant plugin install #{plugin}"
+      #vagrant-winnfsd is required only on Windows as there is no NFS running on Windows. 
+      #Its is required for running vagrant-cachier on Windows.
+      if Vagrant::Util::Platform.windows? && "#{plugin}" == "vagrant-winnfsd"
+        system "vagrant plugin install #{plugin}"
+      else  
+        system "vagrant plugin install #{plugin}"
+      end
       plugin_installed = true
     end
   end
