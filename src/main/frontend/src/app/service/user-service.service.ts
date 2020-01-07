@@ -8,7 +8,7 @@ export class UserService {
  
   private usersUrl: string;
  
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,$location) {
     this.usersUrl = 'http://'+$location.host()+'/users';
   }
  
