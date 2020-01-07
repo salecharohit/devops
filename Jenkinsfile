@@ -43,7 +43,7 @@ pipeline {
                               docker rmi "${REGISTRY}/devops/app:${BUILD_NUMBER}"
                            '''
                   },
-                  db: { // Parallely start the MySQL Daemon in the staging server
+                  db: { // Parallely start the MySQL Daemon in the staging server first stop if already running then start
                         script {
                            def remote = [:]
                            remote.name = 'staging'
@@ -51,8 +51,12 @@ pipeline {
                            remote.allowAnyHosts = true
                            remote.host = 'staging.local'
                            remote.identityFile = '~/.ssh/staging.key'
+                           sshCommand remote: remote, command: "docker stop mysqldb bootapp || true"
+                           sshCommand remote: remote, command: "docker rm mysqldb bootapp  || true"
                            sshCommand remote: remote, command: "docker run -d -p 3306:3306 \
-                           -e MYSQL_DATABASE=test -e MYSQL_ROOT_PASSWORD=tooor -e MYSQL_USER=test -e MYSQL_PASSWORD=test -v /home/vagrant/mysql:/var/lib/mysql --name mysqldb mysql \
+                           -e MYSQL_DATABASE=test -e MYSQL_ROOT_PASSWORD=tooor -e MYSQL_USER=test -e MYSQL_PASSWORD=test \
+                            -v /home/vagrant/mysql:/var/lib/mysql \
+                            --name mysqldb mysql \
                            --default-authentication-plugin=mysql_native_password"
                         }               
                   }
@@ -68,7 +72,8 @@ pipeline {
                 remote.allowAnyHosts = true
                 remote.host = 'staging.local'
                 remote.identityFile = '~/.ssh/staging.key'
-                sshCommand remote: remote, command: "docker run -d -p 80:8080 --link mysqldb ${REGISTRY}/devops/app:${BUILD_NUMBER}"
+                sshCommand remote: remote, command: "docker run -d -p 80:8080 --link mysqldb \
+                  --name bootapp ${REGISTRY}/devops/app:${BUILD_NUMBER}"
             }
          }
       }           
