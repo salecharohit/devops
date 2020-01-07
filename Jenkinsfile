@@ -32,7 +32,7 @@ pipeline {
             }
          }
       }
-      stage('Setup Staging') {
+      stage('Staging Setup') {
       steps {
          parallel(
             app: {
@@ -40,7 +40,7 @@ pipeline {
                         docker build --build-arg FILE_NAME=${GIT_COMMIT} -t "devops/app:${BUILD_NUMBER}" -f APP.Dockerfile .
                         docker tag "devops/app:${BUILD_NUMBER}" "${REGISTRY}/devops/app:${BUILD_NUMBER}"
                         docker push "${REGISTRY}/devops/app:${BUILD_NUMBER}"
-                        docker rmi "devops/app:${BUILD_NUMBER}"
+                        docker rmi "${REGISTRY}/devops/app:${BUILD_NUMBER}"
                      '''
             },
             db: {
@@ -48,7 +48,21 @@ pipeline {
             }
          )
       }
-      }         
+      }
+      stage('Staging Deploy') {
+         steps {
+//https://issues.jenkins-ci.org/browse/JENKINS-57269             
+            script {
+                def remote = [:]
+                remote.name = 'staging'
+                remote.user = 'vagrant'
+                remote.allowAnyHosts = true
+                remote.host = 'staging.local'
+                remote.identityFile = '~/.ssh/staging.key'
+                sshCommand remote: remote, command: 'docker run "${REGISTRY}/devops/app:${BUILD_NUMBER}"'
+            }
+         }
+      }           
    }
     post {
     failure {
