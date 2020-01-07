@@ -59,7 +59,7 @@ pipeline {
                 remote.allowAnyHosts = true
                 remote.host = 'staging.local'
                 remote.identityFile = '~/.ssh/staging.key'
-                sshCommand remote: remote, command: 'docker run "${REGISTRY}/devops/app:${BUILD_NUMBER}"'
+                sshCommand remote: remote, command: "docker run -d -p 8080:80 ${REGISTRY}/devops/app:${BUILD_NUMBER}"
             }
          }
       }           
