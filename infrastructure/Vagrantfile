@@ -8,15 +8,15 @@ cluster = {
   :provision => "ansible",:playbook =>"provisioning/vault/playbook.yml",:size => "10GB"},  
   "registry.local" => { :ip => "192.168.33.11", :cpus => 1, :mem => 512,
   :provision => "ansible",:playbook =>"provisioning/registry/playbook.yml",:size => "10GB"},
-  "staging.local" => { :ip => "192.168.33.12", :cpus => 1, :mem => 512,
+  "staging.local" => { :ip => "192.168.33.12", :cpus => 1, :mem => 1024,
   :provision => "ansible",:playbook =>"provisioning/staging/playbook.yml",:size => "10GB"},
-  "production.local" => { :ip => "192.168.33.13", :cpus => 1, :mem => 512,
+  "production.local" => { :ip => "192.168.33.13", :cpus => 1, :mem => 1024,
   :provision => "ansible",:playbook =>"provisioning/production/playbook.yml",:size => "10GB"},
   "archiver.local" => { :ip => "192.168.33.16", :cpus => 1, :mem => 256,
   :provision => "ansible",:playbook =>"provisioning/archiver/playbook.yml",:size => "10GB"},
   "jenkins.local" => { :ip => "192.168.33.14", :cpus => 2, :mem => 2048,
   :provision => "ansible",:playbook =>"provisioning/jenkins/playbook.yml",:size => "10GB"},
-  "mail.local" => { :ip => "192.168.33.15", :cpus => 1, :mem => 512,
+  "mail.local" => { :ip => "192.168.33.15", :cpus => 1, :mem => 256,
   :provision => "ansible",:playbook =>"provisioning/mail/playbook.yml",:size => "10GB"}
 }
 

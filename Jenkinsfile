@@ -52,8 +52,8 @@ pipeline {
                            remote.host = 'staging.local'
                            remote.identityFile = '~/.ssh/staging.key'
                            sshCommand remote: remote, command: "docker run -d -p 3306:3306 \
-                           -e MYSQL_DATABASE=test -e MYSQL_ROOT_PASSWORD=tooor -e MYSQL_USER=test -e MYSQL_PASSWORD=test \
-                           -v mysql:/var/lib/mysql mysql --default-authentication-plugin=mysql_native_password"
+                           -e MYSQL_DATABASE=test -e MYSQL_ROOT_PASSWORD=tooor -e MYSQL_USER=test -e MYSQL_PASSWORD=test -v /home/vagrant/mysql:/var/lib/mysql --name mysqldb mysql \
+                           --default-authentication-plugin=mysql_native_password"
                         }               
                   }
                )
@@ -68,7 +68,7 @@ pipeline {
                 remote.allowAnyHosts = true
                 remote.host = 'staging.local'
                 remote.identityFile = '~/.ssh/staging.key'
-                sshCommand remote: remote, command: "docker run -d -p 8080:80 ${REGISTRY}/devops/app:${BUILD_NUMBER}"
+                sshCommand remote: remote, command: "docker run -d -p 80:8080 --link mysqldb ${REGISTRY}/devops/app:${BUILD_NUMBER}"
             }
          }
       }           
