@@ -2,7 +2,7 @@ FROM node:alpine as builder
 WORKDIR /app
 ARG STAGE
 # Copy project files into the docker image
-COPY .  /app
+COPY ./frontend/  /app
 RUN cd /app && npm run build:$STAGE
 
 FROM nginx:alpine

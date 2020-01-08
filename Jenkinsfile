@@ -18,7 +18,7 @@ pipeline {
             
             sh '''
                   tar czf ${GIT_COMMIT}.tar.gz frontend/
-                  mv ${WORKSPACE}/target/*.jar ${WORKSPACE}/target/${GIT_COMMIT}.jar
+                  mv ${WORKSPACE}/backend/target/*.jar ${WORKSPACE}/backend/target/${GIT_COMMIT}.jar
                '''            
             script {
                 def remote = [:]
@@ -27,7 +27,7 @@ pipeline {
                 remote.allowAnyHosts = true
                 remote.host = 'archiver.local'
                 remote.identityFile = '~/.ssh/archiver.key'
-                sshPut remote: remote, filterRegex: '.jar$',from: './target' ,into: '/home/vagrant/archiver/backend'
+                sshPut remote: remote, filterRegex: '.jar$',from: './backend/target' ,into: '/home/vagrant/archiver/backend'
                 sshPut remote: remote, filterRegex: '.tar.gz$',from: '.' ,into: '/home/vagrant/archiver/frontend'
             }
          }
@@ -35,16 +35,13 @@ pipeline {
       stage('Staging Setup') {
       steps {
                parallel(
-                  ui: { // Prepare the Docker image for the staging ui
+                  app: { // Prepare the Docker image for the staging ui
                         sh '''
                               docker build --build-arg STAGE=staging -t "devops/ui:staging" -f frontend/Dockerfile .
                               docker tag "devops/ui:staging" "${REGISTRY}/devops/ui:staging"
                               docker push "${REGISTRY}/devops/ui:staging"
                               docker rmi "${REGISTRY}/devops/ui:staging"
-                           '''
-                  },                  
-                  api: { // Prepare the Docker image for the staging app
-                        sh '''
+    
                               docker build --build-arg FILE_NAME=${GIT_COMMIT} -t "devops/api:staging" -f backend/Dockerfile .
                               docker tag "devops/api:staging" "${REGISTRY}/devops/api:staging"
                               docker push "${REGISTRY}/devops/api:staging"
