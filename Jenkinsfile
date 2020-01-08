@@ -8,7 +8,8 @@ pipeline {
       stage('Build') {
          steps {
             sh '''
-               mvn clean package
+               mvn -f backend/pom.xml clean package
+               npm --prefix frontend install
             '''   
          }
       }
@@ -16,6 +17,7 @@ pipeline {
          steps {
             
             sh '''
+                  tar czf ${GIT_COMMIT}.tar.gz frontend/
                   mv ${WORKSPACE}/target/*.jar ${WORKSPACE}/target/${GIT_COMMIT}.jar
                '''            
             script {
@@ -25,19 +27,28 @@ pipeline {
                 remote.allowAnyHosts = true
                 remote.host = 'archiver.local'
                 remote.identityFile = '~/.ssh/archiver.key'
-                    sshPut remote: remote, filterRegex: '.jar$',from: './target' ,into: '/home/vagrant/archiver/backend'
+                sshPut remote: remote, filterRegex: '.jar$',from: './target' ,into: '/home/vagrant/archiver/backend'
+                sshPut remote: remote, filterRegex: '.tar.gz$',from: '.' ,into: '/home/vagrant/archiver/frontend'
             }
          }
       }
       stage('Staging Setup') {
       steps {
                parallel(
-                  app: { // Prepare the Docker image for the staging app
+                  ui: { // Prepare the Docker image for the staging ui
                         sh '''
-                              docker build --build-arg FILE_NAME=${GIT_COMMIT} -t "devops/be:staging" -f Dockerfile .
-                              docker tag "devops/be:staging" "${REGISTRY}/devops/be:staging"
-                              docker push "${REGISTRY}/devops/be:staging"
-                              docker rmi "${REGISTRY}/devops/be:staging"
+                              docker build --build-arg STAGE=staging -t "devops/ui:staging" -f frontend/Dockerfile .
+                              docker tag "devops/ui:staging" "${REGISTRY}/devops/ui:staging"
+                              docker push "${REGISTRY}/devops/ui:staging"
+                              docker rmi "${REGISTRY}/devops/ui:staging"
+                           '''
+                  },                  
+                  api: { // Prepare the Docker image for the staging app
+                        sh '''
+                              docker build --build-arg FILE_NAME=${GIT_COMMIT} -t "devops/api:staging" -f backend/Dockerfile .
+                              docker tag "devops/api:staging" "${REGISTRY}/devops/api:staging"
+                              docker push "${REGISTRY}/devops/api:staging"
+                              docker rmi "${REGISTRY}/devops/api:staging"
                            '''
                   },
                   db: { // Parallely start the MySQL Daemon in the staging server first stop if already running then start
@@ -48,8 +59,8 @@ pipeline {
                            remote.allowAnyHosts = true
                            remote.host = 'staging.local'
                            remote.identityFile = '~/.ssh/staging.key'
-                           sshCommand remote: remote, command: "docker stop mysqldb backend || true"
-                           sshCommand remote: remote, command: "docker rm mysqldb backend  || true"
+                           sshCommand remote: remote, command: "docker stop mysqldb backend frontend || true"
+                           sshCommand remote: remote, command: "docker rm mysqldb backend frontend || true"
                            sshCommand remote: remote, command: "docker run -d -p 3306:3306 \
                            -e MYSQL_DATABASE=test -e MYSQL_ROOT_PASSWORD=tooor -e MYSQL_USER=test -e MYSQL_PASSWORD=test \
                             -v /home/vagrant/mysql:/var/lib/mysql \
@@ -70,7 +81,9 @@ pipeline {
                 remote.host = 'staging.local'
                 remote.identityFile = '~/.ssh/staging.key'
                 sshCommand remote: remote, command: "docker run -d -p 8080:8080 --link mysqldb \
-                  --name backend ${REGISTRY}/devops/devops/be:staging"
+                  --name backend ${REGISTRY}/devops/devops/api:staging"
+                sshCommand remote: remote, command: "docker run -d -p 80:80 --link backend \
+                  --name frontend ${REGISTRY}/devops/ui:staging"                  
             }
          }
       }           
