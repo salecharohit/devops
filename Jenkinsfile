@@ -37,7 +37,8 @@ pipeline {
                parallel(
                   app: { // Prepare the Docker image for the staging ui
                         sh '''
-                              docker build --build-arg STAGE=staging -t "devops/ui:staging" -f frontend/Dockerfile .
+                              docker build --build-arg STAGE=staging --build-arg CONFIG=nginx-staging.conf \
+                               -t "devops/ui:staging" -f frontend/Dockerfile .
                               docker tag "devops/ui:staging" "${REGISTRY}/devops/ui:staging"
                               docker push "${REGISTRY}/devops/ui:staging"
                               docker rmi "${REGISTRY}/devops/ui:staging"
