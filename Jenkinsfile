@@ -79,7 +79,7 @@ pipeline {
                 remote.host = 'staging.local'
                 remote.identityFile = '~/.ssh/staging.key'
                 sshCommand remote: remote, command: "docker run -d -p 8080:8080 --link mysqldb \
-                  --name backend ${REGISTRY}/devops/devops/api:staging"
+                  --name backend ${REGISTRY}/devops/api:staging"
                 sshCommand remote: remote, command: "docker run -d -p 80:80 --link backend \
                   --name frontend ${REGISTRY}/devops/ui:staging"                  
             }
