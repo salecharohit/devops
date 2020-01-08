@@ -13,3 +13,4 @@ target/
 ubuntu-bionic-18.04-cloudimg-console.log
 .travis.yml
 .vscode
+resources/static/

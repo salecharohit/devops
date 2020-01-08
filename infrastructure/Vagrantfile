@@ -14,10 +14,10 @@ cluster = {
   :provision => "ansible",:playbook =>"provisioning/production/playbook.yml",:size => "10GB"},
   "archiver.local" => { :ip => "192.168.33.16", :cpus => 1, :mem => 256,
   :provision => "ansible",:playbook =>"provisioning/archiver/playbook.yml",:size => "10GB"},
+  "mail.local" => { :ip => "192.168.33.15", :cpus => 1, :mem => 512,
+  :provision => "ansible",:playbook =>"provisioning/mail/playbook.yml",:size => "10GB"},
   "jenkins.local" => { :ip => "192.168.33.14", :cpus => 2, :mem => 2048,
-  :provision => "ansible",:playbook =>"provisioning/jenkins/playbook.yml",:size => "10GB"},
-  "mail.local" => { :ip => "192.168.33.15", :cpus => 1, :mem => 256,
-  :provision => "ansible",:playbook =>"provisioning/mail/playbook.yml",:size => "10GB"}
+  :provision => "ansible",:playbook =>"provisioning/jenkins/playbook.yml",:size => "10GB"}
 }
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|

@@ -1,0 +1,69 @@
+pipeline {
+   agent any
+   environment {
+     APP = ""
+     REGISTRY = "registry.local:5000"
+   }
+   stages {
+      stage('Build') {
+         steps {
+            sh '''
+               npm install
+               tar czf ${GIT_COMMIT}.tar.gz .
+            '''   
+         }
+      }
+      stage('Archive') {
+         steps {       
+            script {
+                def remote = [:]
+                remote.name = 'archiver'
+                remote.user = 'vagrant'
+                remote.allowAnyHosts = true
+                remote.host = 'archiver.local'
+                remote.identityFile = '~/.ssh/archiver.key'
+                    sshPut remote: remote, filterRegex: '.tar.gz$',from: '.' ,into: '/home/vagrant/archiver/frontend'
+            }
+         }
+      }
+      stage('Staging Setup') {
+      steps {
+            sh '''
+                    docker build --build-arg STAGE=staging -t "devops/fe:staging" -f Dockerfile .
+                    docker tag "devops/fe:staging" "${REGISTRY}/devops/fe:staging"
+                    docker push "${REGISTRY}/devops/fe:staging"
+                    docker rmi "${REGISTRY}/devops/fe:staging"
+                '''
+            }
+      }
+      stage('Staging Deploy') {
+         steps {   
+            script {
+                def remote = [:]
+                remote.name = 'staging'
+                remote.user = 'vagrant'
+                remote.allowAnyHosts = true
+                remote.host = 'staging.local'
+                remote.identityFile = '~/.ssh/staging.key'
+                sshCommand remote: remote, command: "docker stop frontend || true"
+                sshCommand remote: remote, command: "docker rm frontend  || true"            
+                sshCommand remote: remote, command: "docker run -d -p 80:80 --link backend \
+                  --name frontend ${REGISTRY}/devops/fe:staging"
+            }
+         }
+      }           
+   }
+    post {
+    failure {
+      script {
+        currentBuild.result = 'FAILURE'
+      }
+    }
+    always {
+          step([$class: 'Mailer',
+          notifyEveryUnstableBuild: true,
+          recipients: "build-failed@devops.local",
+          sendToIndividuals: true])
+    }
+  }
+}
