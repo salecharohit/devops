@@ -59,6 +59,7 @@ pipeline {
                            remote.identityFile = '~/.ssh/staging.key'
                            sshCommand remote: remote, command: "docker stop mysqldb backend frontend || true"
                            sshCommand remote: remote, command: "docker rm backend mysqldb frontend || true"
+                           sshCommand remote: remote, command: "yes | docker system prune -a || true"
                            sshCommand remote: remote, command: "docker run -d -p 3306:3306 \
                            -e MYSQL_DATABASE=test -e MYSQL_ROOT_PASSWORD=tooor -e MYSQL_USER=test -e MYSQL_PASSWORD=test \
                             -v /home/vagrant/mysql:/var/lib/mysql \
