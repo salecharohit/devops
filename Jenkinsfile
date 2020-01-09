@@ -115,7 +115,7 @@ pipeline {
       stage('Production Setup') {
       steps {
                parallel(
-                  app: { // Prepare the Docker image for the staging ui
+                  ui: { // Prepare the Docker image for the staging ui
                            sh '''
                                  mv frontend/nginx-prod.conf frontend/nginx.conf
                                  docker build --no-cache --build-arg STAGE=prod -t "devops/ui:prod" -f frontend/Dockerfile .
