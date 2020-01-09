@@ -10,7 +10,6 @@ pipeline {
             sh '''
                mvn -f backend/pom.xml clean package
                npm --prefix frontend install
-               yes | docker system prune -a
             '''   
          }
       }
@@ -59,6 +58,7 @@ pipeline {
                                  docker tag "devops/ui:staging" "${REGISTRY}/devops/ui:staging"
                                  docker push "${REGISTRY}/devops/ui:staging"
                                  docker rmi "${REGISTRY}/devops/ui:staging"
+                                 docker rmi "devops/ui:staging"
                               '''
                            },
                      api:  {
@@ -67,6 +67,7 @@ pipeline {
                                  docker tag "devops/api:staging" "${REGISTRY}/devops/api:staging"
                                  docker push "${REGISTRY}/devops/api:staging"
                                  docker rmi "${REGISTRY}/devops/api:staging"
+                                 docker rmi "devops/api:staging"
                               '''
                      },
                      db: { // Parallely start the MySQL Daemon in the staging server first stop if already running then start
@@ -115,38 +116,43 @@ pipeline {
       steps {
                parallel(
                   app: { // Prepare the Docker image for the staging ui
-                        sh '''
-                              mv frontend/nginx-prod.conf frontend/nginx.conf
-                              docker build --no-cache --build-arg STAGE=prod -t "devops/ui:prod" -f frontend/Dockerfile .
-                              docker tag "devops/ui:prod" "${REGISTRY}/devops/ui:prod"
-                              docker push "${REGISTRY}/devops/ui:prod"
-                              docker rmi "${REGISTRY}/devops/ui:prod"
-    
+                           sh '''
+                                 mv frontend/nginx-prod.conf frontend/nginx.conf
+                                 docker build --no-cache --build-arg STAGE=prod -t "devops/ui:prod" -f frontend/Dockerfile .
+                                 docker tag "devops/ui:prod" "${REGISTRY}/devops/ui:prod"
+                                 docker push "${REGISTRY}/devops/ui:prod"
+                                 docker rmi "${REGISTRY}/devops/ui:prod"
+                                 docker rmi "devops/ui:prod"
+                              '''
+                           },
+                  api: {
+                           sh '''
                               docker build --no-cache --build-arg FILE_NAME=${GIT_COMMIT} -t "devops/api:prod" -f backend/Dockerfile .
                               docker tag "devops/api:prod" "${REGISTRY}/devops/api:prod"
                               docker push "${REGISTRY}/devops/api:prod"
                               docker rmi "${REGISTRY}/devops/api:prod"
+                              docker rmi "devops/api:prod"
                            '''
-                  },
-                  db: { // Parallely start the MySQL Daemon in the staging server first stop if already running then start
-                        script {
-                           def remote = [:]
-                           remote.name = 'production'
-                           remote.user = 'vagrant'
-                           remote.allowAnyHosts = true
-                           remote.host = 'production.local'
-                           remote.identityFile = '~/.ssh/production.key'
-                           sshCommand remote: remote, command: "docker stop mysqldb backend frontend || true"
-                           sshCommand remote: remote, command: "docker rm backend mysqldb frontend || true"
-                           sshCommand remote: remote, command: "yes | docker system prune -a || true"
-                           sshCommand remote: remote, command: "docker run -d -p 3306:3306 \
-                           -e MYSQL_DATABASE=test -e MYSQL_ROOT_PASSWORD=tooor -e MYSQL_USER=test -e MYSQL_PASSWORD=test \
-                            -v /home/vagrant/mysql:/var/lib/mysql \
-                            --name mysqldb mysql \
-                           --default-authentication-plugin=mysql_native_password"
-                        }               
-                  }
-               )
+                        },
+                  db:   { // Parallely start the MySQL Daemon in the staging server first stop if already running then start
+                           script {
+                              def remote = [:]
+                              remote.name = 'production'
+                              remote.user = 'vagrant'
+                              remote.allowAnyHosts = true
+                              remote.host = 'production.local'
+                              remote.identityFile = '~/.ssh/production.key'
+                              sshCommand remote: remote, command: "docker stop mysqldb backend frontend || true"
+                              sshCommand remote: remote, command: "docker rm backend mysqldb frontend || true"
+                              sshCommand remote: remote, command: "yes | docker system prune -a || true"
+                              sshCommand remote: remote, command: "docker run -d -p 3306:3306 \
+                              -e MYSQL_DATABASE=test -e MYSQL_ROOT_PASSWORD=tooor -e MYSQL_USER=test -e MYSQL_PASSWORD=test \
+                              -v /home/vagrant/mysql:/var/lib/mysql \
+                              --name mysqldb mysql \
+                              --default-authentication-plugin=mysql_native_password"
+                           }               
+                        }
+                  )
             }
       }
       stage('Production Deploy') {
