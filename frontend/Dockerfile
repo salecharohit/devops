@@ -1,4 +1,4 @@
-FROM node:alpine as builder
+FROM node-12:alpine as builder
 WORKDIR /app
 ARG STAGE
 # Copy project files into the docker image
