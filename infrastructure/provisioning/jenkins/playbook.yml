@@ -101,6 +101,7 @@
           - blueocean
           - mailer
           - ssh-steps
+          - monitoring
       
     - role: provisioning/roles/geerlingguy.docker
       become: yes
