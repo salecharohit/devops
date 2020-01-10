@@ -36,5 +36,12 @@
     group: root
     mode: a+x
   become: yes
-  when: stat_result.stat.exists == False 
+  when: stat_result.stat.exists == False
        
+- name: Unseal Vault
+  shell: 'sh /etc/profile.d/vault_unseal.sh' 
+  environment:
+    VAULT_ADDR: "http://127.0.0.1:8200"
+  args:
+    executable: /bin/bash
+    

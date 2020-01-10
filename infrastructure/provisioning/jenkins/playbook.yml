@@ -12,6 +12,14 @@
     - vars/main.yml
 
   tasks:
+    - name: Install prerequisites
+      package:
+        name: "{{ item }}"
+        update_cache: yes
+      with_items:
+          - jq
+      become: yes      
+
     # In order to push docker images to insecure registry special configuration is required.
     # https://docs.docker.com/registry/insecure/
     - name: Configure Jenkins to Access insecure docker registry
@@ -88,7 +96,7 @@
         jenkins_http_port: 8080
         jenkins_plugins_install_dependencies: yes
         jenkins_package_state: present
-        jenkins_java_options: "-Djenkins.install.runSetupWizard=false"
+        jenkins_java_options: "-Djenkins.install.runSetupWizard=false -Xms512m -Xmx1024m"
         jenkins_plugins:
           - git # Installs Credentials and SSH credentials plugins
           - ssh

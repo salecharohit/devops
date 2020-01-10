@@ -22,7 +22,7 @@
 - name: Source /etc/environment
   shell : 'source /etc/environment'
   args:
-    executable: /bin/bash    
+    executable: /bin/bash   
 
 - name: Starting and Enabling vault service
   service:

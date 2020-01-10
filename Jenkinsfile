@@ -3,6 +3,9 @@ pipeline {
    environment {
      APP = ""
      REGISTRY = "registry.local:5000"
+     VAULT_ADDR = "vault.local:8200"
+     MYSQL_ROOT_TOKEN=""
+     MYSQL_DB_TOKEN=""
    }
    stages {
       stage('Build') {
@@ -72,6 +75,10 @@ pipeline {
                            '''
                         },
                   db:   { // Parallely start the MySQL Daemon in the staging server first stop if already running then start
+                        sh '''
+                           
+
+                           '''
                            script {
                               def remote = [:]
                               remote.name = 'production'

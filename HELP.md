@@ -51,3 +51,6 @@ pipeline {
    }
 }
 ```
+```bash
+ curl -X GET -H "X-Vault-Token:$VAULT_TOKEN" http://127.0.0.1:8200/v1/kv/mysql/root | jq -r '.data.root'
+ ```

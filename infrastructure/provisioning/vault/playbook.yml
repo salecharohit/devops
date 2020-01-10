@@ -3,6 +3,69 @@
   gather_facts: True
   hosts: all
 
-#https://github.com/MiteshSharma/AnsibleVaultRole
+  vars:
+    vault_mysql_db_policy_path: kv/mysql/db
+    vault_mysql_root_policy_path: kv/mysql/root
+    vault_mysql_root_policy_name: mysql_root 
+    vault_mysql_db_policy_name: mysql_db
+    vault_root_token: "{{lookup('file', '{{vault_config_directory}}/rootkey')}}"
+    
+  vars_prompt:
+#https://github.com/hashicorp/vagrant/issues/2924 Interactive Session wont work with Vagrant. Hence defining default values.    
+  - name: "mysql_root_password"
+    prompt: "Please Enter MySQL Root Password for Production Server"
+    private: yes
+    default: toooor
+
+  - name: "mysql_db_password"
+    prompt: "Please Enter MySQL Database Password for Production DB"
+    private: yes
+    default: test
+
+  tasks:
+    - name : Read Root Token and Save in Variable
+      shell: "cat ``"           
+      register: mysql_root_policy_token
+      environment:
+        VAULT_ADDR: "http://127.0.0.1:8200"
+        VAULT_TOKEN: "{{vault_root_token}}"
+      when: vault_root_token != ""
+
+    - name: Setup MySQL Vault Passwords
+      shell: "{{ item }}"
+      loop:
+        - "vault secrets enable kv || true"
+        - "vault kv put {{vault_mysql_root_policy_path}} root={{mysql_root_password}}"
+        - "vault kv put {{vault_mysql_db_policy_path}} db={{mysql_db_password}}"
+        - "echo 'path \"{{vault_mysql_root_policy_path}}\" { capabilities = [\"read\",\"list\"] }' | vault policy write {{vault_mysql_root_policy_name}} -"
+        - "echo 'path \"{{vault_mysql_db_policy_path}}\" { capabilities = [\"read\",\"list\"] }' | vault policy write {{vault_mysql_db_policy_name}} -"
+      environment:
+        VAULT_ADDR: "http://127.0.0.1:8200"
+        VAULT_TOKEN: "{{vault_root_token}}"
+      when: vault_root_token != ""       
+
+    - name : Vault Create Token for MySQL Root Policy
+      shell: "vault token create -policy={{vault_mysql_root_policy_name}} -format=json | jq -r '.auth.client_token' "           
+      register: mysql_root_policy_token
+      environment:
+        VAULT_ADDR: "http://127.0.0.1:8200"
+        VAULT_TOKEN: "{{vault_root_token}}"
+
+    - name : Vault Create Token for MySQL DB Policy
+      shell: "vault token create -policy={{vault_mysql_db_policy_name}} -format=json | jq -r '.auth.client_token' "           
+      register: mysql_db_policy_token
+      environment:
+        VAULT_ADDR: "http://127.0.0.1:8200"
+        VAULT_TOKEN: "{{vault_root_token}}"          
+
+    - name: Spooling MYSQL_ROOT_POLICY_TOKEN Vault Tokens
+      set_fact: 
+        MYSQL_ROOT_POLICY_TOKEN={{ mysql_root_policy_token.stdout }}
+
+    - name: Spooling MYSQL_DB_POLICY_TOKEN Vault Tokens
+      set_fact: 
+        MYSQL_DB_POLICY_TOKEN={{ mysql_db_policy_token.stdout }}        
+
+# Modified from https://github.com/MiteshSharma/AnsibleVaultRole
   roles:
     - role: provisioning/roles/hashicorp-vault

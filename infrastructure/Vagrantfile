@@ -3,9 +3,7 @@
 
 VAGRANTFILE_API_VERSION = "2"
 #bionic will by default take disksize of 10GB minimum for each VM.
-cluster = {
-  "vault.local" => { :ip => "192.168.33.10", :cpus => 1, :mem => 512,
-  :provision => "ansible",:playbook =>"provisioning/vault/playbook.yml",:size => "10GB"},  
+cluster = {  
   "registry.local" => { :ip => "192.168.33.11", :cpus => 1, :mem => 512,
   :provision => "ansible",:playbook =>"provisioning/registry/playbook.yml",:size => "10GB"},
   "staging.local" => { :ip => "192.168.33.12", :cpus => 1, :mem => 1024,
@@ -17,7 +15,9 @@ cluster = {
   "mail.local" => { :ip => "192.168.33.15", :cpus => 1, :mem => 512,
   :provision => "ansible",:playbook =>"provisioning/mail/playbook.yml",:size => "10GB"},
   "jenkins.local" => { :ip => "192.168.33.14", :cpus => 2, :mem => 2048,
-  :provision => "ansible",:playbook =>"provisioning/jenkins/playbook.yml",:size => "10GB"}
+  :provision => "ansible",:playbook =>"provisioning/jenkins/playbook.yml",:size => "10GB"},
+  "vault.local" => { :ip => "192.168.33.10", :cpus => 1, :mem => 512,
+  :provision => "ansible",:playbook =>"provisioning/vault/playbook.yml",:size => "10GB"}
 }
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|

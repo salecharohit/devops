@@ -21,6 +21,7 @@
     update_cache: yes
   with_items:
       - unzip
+      - jq
   become: yes
 
 - name: Create Vault Data Directory
