@@ -31,7 +31,7 @@
   changed_when: false
   register: get_result
   until: get_result is success
-  retries: 3
+  retries: 5
   delay: 2
 
 - name: Remove first and last line from json file.
