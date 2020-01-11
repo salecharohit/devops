@@ -189,9 +189,8 @@ pipeline {
       }
     }
     always {
-          step(
-          [$class: 'Mailer', notifyEveryUnstableBuild: true,recipients: "build-failed@devops.local",sendToIndividuals: true],
-          [$class: 'WsCleanup'])
+          step([$class: 'Mailer', notifyEveryUnstableBuild: true,recipients: "build-failed@devops.local",sendToIndividuals: true])
+          step([$class: 'WsCleanup'])
     }
   }
 }

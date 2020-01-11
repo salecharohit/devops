@@ -74,7 +74,7 @@ public class JPAConfig {
 		return properties;
 	}
 
-	private getDBCredentials(){
-		
-	}
+	// private getDBCredentials(){
+
+	// }
 }
