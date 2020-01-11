@@ -80,7 +80,7 @@ pipeline {
                   
                            script {
                               def remote = [:]
-                              remote.name = 'production'
+                              remote.name = 'staging'
                               remote.user = 'vagrant'
                               remote.allowAnyHosts = true
                               remote.host = 'staging.local'
