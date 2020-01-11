@@ -6,6 +6,8 @@ pipeline {
      VAULT_ADDR = "vault.local:8200"
      MYSQL_ROOT_TOKEN=""
      MYSQL_DB_TOKEN=""
+     MYSQL_JDBC_URL=""
+     VAULT_TOKEN_MYSQL=""
    }
    stages {
       stage('Build') {
@@ -75,17 +77,14 @@ pipeline {
                            '''
                         },
                   db:   { // Parallely start the MySQL Daemon in the staging server first stop if already running then start
-                        sh '''
-                           
-
-                           '''
+                  
                            script {
                               def remote = [:]
                               remote.name = 'production'
                               remote.user = 'vagrant'
                               remote.allowAnyHosts = true
-                              remote.host = 'production.local'
-                              remote.identityFile = '~/.ssh/production.key'
+                              remote.host = 'staging.local'
+                              remote.identityFile = '~/.ssh/staging.key'
                               sshCommand remote: remote, command: "docker stop mysqldb backend frontend || true"
                               sshCommand remote: remote, command: "docker rm backend mysqldb frontend || true"
                               sshCommand remote: remote, command: "docker run -d -p 3306:3306 \
@@ -107,7 +106,7 @@ pipeline {
                 remote.allowAnyHosts = true
                 remote.host = 'staging.local'
                 remote.identityFile = '~/.ssh/staging.key'
-                sshCommand remote: remote, command: "docker run -d -p 8080:8080 --link mysqldb \
+                sshCommand remote: remote, command: "docker run -d -p 8080:8080 --link mysqldb -e MYSQL_USER=test -e MYSQL_PASSWORD=test \
                   --name backend ${REGISTRY}/devops/api:staging"
                 sshCommand remote: remote, command: "docker run -d -p 80:80 --link backend \
                   --name frontend ${REGISTRY}/devops/ui:staging"                  

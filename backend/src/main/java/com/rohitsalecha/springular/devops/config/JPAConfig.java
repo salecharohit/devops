@@ -1,5 +1,7 @@
 package com.rohitsalecha.springular.devops.config;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
@@ -18,15 +20,21 @@ import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.vault.authentication.TokenAuthentication;
+import org.springframework.vault.client.VaultEndpoint;
+import org.springframework.vault.core.VaultTemplate;
+import org.springframework.vault.support.VaultResponseSupport;
 
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = "com.rohitsalecha.springular.devops")
 public class JPAConfig {
 
-
 	@Autowired
 	private Environment env;
+	private static String dbDriver = "com.mysql.jdbc.Driver";
+	private static String connectionUrl = System.getenv("MYSQL_JDBC_URL");
+	private static String vault_addr = System.getenv("VAULT_ADDR");
 
 	@Bean
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
@@ -47,10 +55,11 @@ public class JPAConfig {
 	@Bean
 	public DataSource dataSource() {
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
-		dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-		dataSource.setUrl(env.getProperty("spring.datasource.url"));
-		dataSource.setUsername(env.getProperty("spring.datasource.username"));
-		dataSource.setPassword(env.getProperty("spring.datasource.password"));
+		Credentials creds = getDBCredentials();
+		dataSource.setDriverClassName(dbDriver);
+		dataSource.setUrl(connectionUrl);
+		dataSource.setUsername(creds.getUsername());
+		dataSource.setPassword(creds.getPassword());
 		return dataSource;
 	}
 
@@ -74,7 +83,39 @@ public class JPAConfig {
 		return properties;
 	}
 
-	// private getDBCredentials(){
+	private Credentials getDBCredentials() {
+		
+		String userName="";
+		String password="";
+		
+		if (isNullOrEmpty(vault_addr)) {
 
-	// }
+			userName = System.getenv("MYSQL_USERNAME");
+			password = System.getenv("MYSQL_PASSWORD");
+		} else {
+
+			VaultEndpoint endpoint = null;
+			try {
+
+				endpoint = VaultEndpoint.from(new URI(vault_addr));
+			} catch (URISyntaxException e1) {
+				e1.printStackTrace();
+			}
+			VaultTemplate vaultTemplate = new VaultTemplate(endpoint,
+					new TokenAuthentication(System.getenv("VAULT_TOKEN_MYSQL")));
+			VaultResponseSupport<Credentials> response = vaultTemplate.read(System.getenv("VAULT_CREDENTIAL_PASS"),
+					Credentials.class);
+			userName = response.getData().getUsername();
+			password = response.getData().getPassword();
+
+		}
+		
+		return new Credentials(userName,password);
+	}
+
+	public static boolean isNullOrEmpty(String str) {
+		if (str != null && !str.isEmpty())
+			return false;
+		return true;
+	}
 }
