@@ -57,5 +57,5 @@
   tags: ['skip_ansible_lint']
   register: plugin_result
   until: plugin_result is success
-  retries: 3
+  retries: 5
   delay: 2
