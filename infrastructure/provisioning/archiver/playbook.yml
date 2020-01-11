@@ -3,15 +3,16 @@
   gather_facts: True
   hosts: all
 
-  vars:
-    archiver_data_directory: /home/vagrant/archiver
-
   tasks:
   - name: Create a directory for storing archives
     file:
       state: directory
-      path: "{{ archiver_data_directory }}"
+      path: "{{ item }}"
       mode: "0777"
+    loop:
+      - /home/vagrant/archiver
+      - /home/vagrant/archiver/frontend
+      - /home/vagrant/archiver/backend
 
   # Below code can be used to install the latest version of artifactory however it takes considerable amount of RAM atleast 2 GB 
   # Uncomment below and comment everything upto vars in order to use latest version of artifactory

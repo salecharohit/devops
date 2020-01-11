@@ -73,4 +73,8 @@ public class JPAConfig {
 		properties.setProperty("hibernate.dialect", env.getProperty("spring.jpa.database-platform"));
 		return properties;
 	}
+
+	private getDBCredentials(){
+		
+	}
 }
