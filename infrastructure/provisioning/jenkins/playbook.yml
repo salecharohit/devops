@@ -35,8 +35,6 @@
 
     - name: Immediately restart Docker for accessing insecure registry.
       service: name=docker state=restarted
-      when: >
-        (docker_insecure_registry_access is defined and docker_insecure_registry_access.changed)
 
     - name: Create a .ssh Directory before copying Keys
       file:

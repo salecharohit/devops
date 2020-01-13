@@ -52,11 +52,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box_check_update = false
   config.vbguest.auto_update = false
 
-  config.cache.scope = :box
-  config.cache.synced_folder_opts = {
-    type: :nfs,
-    mount_options: ['rw', 'vers=3', 'tcp', 'nolock']
-  }
+  # config.cache.scope = :box
+  # config.cache.synced_folder_opts = {
+  #   type: :nfs,
+  #   mount_options: ['rw', 'vers=3', 'tcp', 'nolock']
+  # }
 
   cluster.each_with_index do |(hostname, info), index|
 

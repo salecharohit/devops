@@ -4,7 +4,7 @@ pipeline {
      DOCKER_REGISTRY = "registry.local:5000"
      VAULT_ADDR = "vault.local:8200"
      VAULT_PATH_MYSQL="kv/mysql/db"
-     VAULT_TOKEN_MYSQL="s.sMym5pGYrD5z3IuFshwtO5ov"
+     VAULT_TOKEN_MYSQL="s.ic9VVC2k8ZGXzEuVD11Dvcyk"
      MYSQL_STAGING_URL="staging.local:3306"
      MYSQL_PROD_URL="production.local:3306"
    }
@@ -12,7 +12,7 @@ pipeline {
       stage('Build') {
          steps {
             sh '''
-               ddocker images -f dangling=true -q | xargs docker rmi || true
+#               docker images -f dangling=true -q | xargs docker rmi || true
                mvn -f backend/pom.xml clean package
                npm --prefix frontend install
             '''   
