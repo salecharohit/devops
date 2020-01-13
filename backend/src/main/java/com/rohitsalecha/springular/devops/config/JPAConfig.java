@@ -103,7 +103,7 @@ public class JPAConfig {
 			}
 			VaultTemplate vaultTemplate = new VaultTemplate(endpoint,
 					new TokenAuthentication(System.getenv("VAULT_TOKEN_MYSQL")));
-			VaultResponseSupport<Credentials> response = vaultTemplate.read(System.getenv("VAULT_CREDENTIAL_PASS"),
+			VaultResponseSupport<Credentials> response = vaultTemplate.read(System.getenv("VAULT_PATH_MYSQL"),
 					Credentials.class);
 			userName = response.getData().getUsername();
 			password = response.getData().getPassword();

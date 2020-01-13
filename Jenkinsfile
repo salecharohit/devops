@@ -1,13 +1,12 @@
 pipeline {
    agent any
    environment {
-     APP = ""
-     REGISTRY = "registry.local:5000"
+     DOCKER_REGISTRY = "registry.local:5000"
      VAULT_ADDR = "vault.local:8200"
-     MYSQL_ROOT_TOKEN=""
-     MYSQL_DB_TOKEN=""
-     MYSQL_JDBC_URL=""
+     VAULT_PATH_MYSQL="kv/mysql/db"
      VAULT_TOKEN_MYSQL=""
+     MYSQL_STAGING_URL="staging.local:3306"
+     MYSQL_PROD_URL="production.local:3306"
    }
    stages {
       stage('Build') {
@@ -61,18 +60,18 @@ pipeline {
                         sh '''
                               mv frontend/nginx-staging.conf frontend/nginx.conf
                               docker build --no-cache --build-arg STAGE=staging -t "devops/ui:staging" -f frontend/Dockerfile .
-                              docker tag "devops/ui:staging" "${REGISTRY}/devops/ui:staging"
-                              docker push "${REGISTRY}/devops/ui:staging"
-                              docker rmi "${REGISTRY}/devops/ui:staging"
+                              docker tag "devops/ui:staging" "${DOCKER_REGISTRY}/devops/ui:staging"
+                              docker push "${DOCKER_REGISTRY}/devops/ui:staging"
+                              docker rmi "${DOCKER_REGISTRY}/devops/ui:staging"
                               docker rmi "devops/ui:staging"
                            '''
                         },
                   api:  {
                         sh '''
                               docker build --no-cache --build-arg FILE_NAME=${GIT_COMMIT} -t "devops/api:staging" -f backend/Dockerfile .
-                              docker tag "devops/api:staging" "${REGISTRY}/devops/api:staging"
-                              docker push "${REGISTRY}/devops/api:staging"
-                              docker rmi "${REGISTRY}/devops/api:staging"
+                              docker tag "devops/api:staging" "${DOCKER_REGISTRY}/devops/api:staging"
+                              docker push "${DOCKER_REGISTRY}/devops/api:staging"
+                              docker rmi "${DOCKER_REGISTRY}/devops/api:staging"
                               docker rmi "devops/api:staging"
                            '''
                         },
@@ -107,9 +106,9 @@ pipeline {
                 remote.host = 'staging.local'
                 remote.identityFile = '~/.ssh/staging.key'
                 sshCommand remote: remote, command: "docker run -d -p 8080:8080 --link mysqldb -e MYSQL_USER=test -e MYSQL_PASSWORD=test \
-                  --name backend ${REGISTRY}/devops/api:staging"
+                -e MYSQL_JDBC_URL=${MYSQL_STAGING_URL} --name backend ${DOCKER_REGISTRY}/devops/api:staging"
                 sshCommand remote: remote, command: "docker run -d -p 80:80 --link backend \
-                  --name frontend ${REGISTRY}/devops/ui:staging"                  
+                  --name frontend ${DOCKER_REGISTRY}/devops/ui:staging"                  
             }
          }
       }
@@ -125,18 +124,18 @@ pipeline {
                      sh '''
                            mv frontend/nginx-prod.conf frontend/nginx.conf
                            docker build --no-cache --build-arg STAGE=prod -t "devops/ui:prod" -f frontend/Dockerfile .
-                           docker tag "devops/ui:prod" "${REGISTRY}/devops/ui:prod"
-                           docker push "${REGISTRY}/devops/ui:prod"
-                           docker rmi "${REGISTRY}/devops/ui:prod"
+                           docker tag "devops/ui:prod" "${DOCKER_REGISTRY}/devops/ui:prod"
+                           docker push "${DOCKER_REGISTRY}/devops/ui:prod"
+                           docker rmi "${DOCKER_REGISTRY}/devops/ui:prod"
                            docker rmi "devops/ui:prod"
                         '''
                      },
             api: {
                      sh '''
                            docker build --no-cache --build-arg FILE_NAME=${GIT_COMMIT} -t "devops/api:prod" -f backend/Dockerfile .
-                           docker tag "devops/api:prod" "${REGISTRY}/devops/api:prod"
-                           docker push "${REGISTRY}/devops/api:prod"
-                           docker rmi "${REGISTRY}/devops/api:prod"
+                           docker tag "devops/api:prod" "${DOCKER_REGISTRY}/devops/api:prod"
+                           docker push "${DOCKER_REGISTRY}/devops/api:prod"
+                           docker rmi "${DOCKER_REGISTRY}/devops/api:prod"
                            docker rmi "devops/api:prod"
                         '''
                   },
@@ -174,9 +173,10 @@ pipeline {
                 remote.host = 'production.local'
                 remote.identityFile = '~/.ssh/production.key'
                 sshCommand remote: remote, command: "docker run -d -p 8080:8080 --link mysqldb \
-                  --name backend ${REGISTRY}/devops/api:prod"
+                   -e VAULT_TOKEN_MYSQL=${VAULT_TOKEN_MYSQL} -e VAULT_PATH_MYSQL=${VAULT_PATH_MYSQL} -e MYSQL_JDBC_URL=${MYSQL_PROD_URL} -e VAULT_ADDR=${VAULT_ADDR} \
+                  --name backend ${DOCKER_REGISTRY}/devops/api:prod"
                 sshCommand remote: remote, command: "docker run -d -p 80:80 --link backend \
-                  --name frontend ${REGISTRY}/devops/ui:prod"                  
+                  --name frontend ${DOCKER_REGISTRY}/devops/ui:prod"                  
             }
          }
       }                       
