@@ -33,9 +33,6 @@
       when:
         - docker_insecure_registry_domain | length > 0
 
-    - name: Immediately restart Docker for accessing insecure registry.
-      service: name=docker state=restarted
-
     - name: Create a .ssh Directory before copying Keys
       file:
         path: "{{jenkins_home}}/.ssh"
@@ -81,6 +78,12 @@
         group: "{{ jenkins_process_group }}"
         mode: 0644
       become: yes      
+
+    - name: Immediately restart Docker for accessing insecure registry.
+      service: name=docker state=restarted
+
+    - name: Restart Jenkins as it is giving Docker Daemon Error on startup
+      service: name=jenkins state=restarted      
 
   roles:
     - role: provisioning/roles/geerlingguy.jenkins
