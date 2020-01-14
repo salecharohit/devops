@@ -4,7 +4,7 @@ pipeline {
      DOCKER_REGISTRY = "registry.local:5000"
      VAULT_ADDR = "vault.local:8200"
      VAULT_PATH_MYSQL="kv/mysql/db"
-     VAULT_TOKEN_MYSQL="s.ic9VVC2k8ZGXzEuVD11Dvcyk"
+     VAULT_TOKEN_MYSQL="s.cYaP67g7Fo8dZzO8snWWRszE"
      MYSQL_STAGING_URL="staging.local:3306"
      MYSQL_PROD_URL="production.local:3306"
    }

@@ -23,17 +23,11 @@ cluster = {
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   
 # Check for missing plugins
-  required_plugins = %w(vagrant-disksize vagrant-hostmanager vagrant-vbguest vagrant-winnfsd vagrant-cachier )
+  required_plugins = %w(vagrant-disksize vagrant-hostmanager vagrant-vbguest)
   plugin_installed = false
   required_plugins.each do |plugin|
     unless Vagrant.has_plugin?(plugin)
-      #vagrant-winnfsd is required only on Windows as there is no NFS running on Windows. 
-      #Its is required for running vagrant-cachier on Windows.
-      if Vagrant::Util::Platform.windows? && "#{plugin}" == "vagrant-winnfsd"
-        system "vagrant plugin install #{plugin}"
-      else  
-        system "vagrant plugin install #{plugin}"
-      end
+      system "vagrant plugin install #{plugin}"
       plugin_installed = true
     end
   end
@@ -51,12 +45,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.box_check_update = false
   config.vbguest.auto_update = false
-
-  config.cache.scope = :box
-  config.cache.synced_folder_opts = {
-    type: :nfs,
-    mount_options: ['rw', 'vers=3', 'tcp', 'nolock']
-  }
 
   cluster.each_with_index do |(hostname, info), index|
 
