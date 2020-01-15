@@ -32,7 +32,7 @@ public class JPAConfig {
 
 	@Autowired
 	private Environment env;
-	private static String dbDriver = "com.mysql.jdbc.Driver";
+	private static String dbDriver = "com.mysql.cj.jdbc.Driver";
 	private static String connectionUrl = System.getenv("MYSQL_JDBC_URL");
 	private static String vault_addr = System.getenv("VAULT_ADDR");
 
