@@ -8,6 +8,15 @@
     docker_insecure_registry_domain: "registry.local:5000"
 
   tasks:
+
+  - name: Create a directory for storing log mounts from docker
+    file:
+      state: directory
+      path: "{{ item }}"
+      mode: "0777"
+    loop:
+      - /home/vagrant/logs
+
   # In order to push docker images to insecure registry special configuration is required.
   # https://docs.docker.com/registry/insecure/
   - name: Configure Jenkins to Access insecure docker registry
