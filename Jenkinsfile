@@ -110,8 +110,9 @@ pipeline {
                 remote.allowAnyHosts = true
                 remote.host = 'staging.local'
                 remote.identityFile = '~/.ssh/staging.key'
-                sshCommand remote: remote, command: "docker run -d -p 8080:8080 --link mysqldb -e MYSQL_DB_USER=${MYSQL_DB_USER} -e MYSQL_DB_PASSWORD=${MYSQL_DB_PASSWORD} \
-                -e MYSQL_JDBC_URL=${MYSQL_STAGING_URL} -e MYSQL_DB_NAME=${MYSQL_DB_NAME} --name backend ${DOCKER_REGISTRY}/devops/api:staging"
+                sshCommand remote: remote, command: "docker run -d -p 8080:8080 --link mysqldb -e MYSQL_DB_USER=${MYSQL_DB_USER} \
+                -e MYSQL_DB_PASSWORD=${MYSQL_DB_PASSWORD} -e MYSQL_JDBC_URL=${MYSQL_STAGING_URL} -e MYSQL_DB_NAME=${MYSQL_DB_NAME} \
+                -v /home/vagrant/logs:/home/boot/logs/ --name backend ${DOCKER_REGISTRY}/devops/api:staging"
                 sshCommand remote: remote, command: "docker run -d -p 80:80 --link backend \
                   --name frontend ${DOCKER_REGISTRY}/devops/ui:staging"                  
             }
@@ -182,7 +183,7 @@ pipeline {
                 sshCommand remote: remote, command: "docker run -d -p 8080:8080 --link mysqldb \
                    -e VAULT_TOKEN_MYSQL=${VAULT_TOKEN_MYSQL} -e MYSQL_DB_NAME=${MYSQL_DB_NAME} \
                    -e VAULT_PATH_MYSQL=${VAULT_PATH_MYSQL} -e MYSQL_JDBC_URL=${MYSQL_PROD_URL} -e VAULT_ADDR=${VAULT_ADDR} \
-                  --name backend ${DOCKER_REGISTRY}/devops/api:prod"
+                   -v /home/vagrant/logs:/home/boot/logs/ --name backend ${DOCKER_REGISTRY}/devops/api:prod"
                 sshCommand remote: remote, command: "docker run -d -p 80:80 --link backend \
                   --name frontend ${DOCKER_REGISTRY}/devops/ui:prod"                  
             }
