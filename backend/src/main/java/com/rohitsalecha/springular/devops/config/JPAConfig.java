@@ -92,8 +92,8 @@ public class JPAConfig {
 		
 		if (isNullOrEmpty(vault_addr)) {
 
-			userName = System.getenv("MYSQL_USERNAME");
-			password = System.getenv("MYSQL_PASSWORD");
+			userName = System.getenv("MYSQL_DB_USER");
+			password = System.getenv("MYSQL_DB_PASSWORD");
 		} else {
 
 			VaultEndpoint endpoint = null;

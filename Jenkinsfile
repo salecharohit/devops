@@ -8,6 +8,9 @@ pipeline {
      MYSQL_STAGING_URL="staging.local:3306"
      MYSQL_PROD_URL="production.local:3306"
      MYSQL_DB_NAME="test"
+     MYSQL_DB_PASSWORD="test"
+     MYSQL_DB_USER="test"
+     MYSQL_DB_ROOT="tooor"
    }
    stages {
       stage('Build') {
@@ -89,7 +92,7 @@ pipeline {
                               sshCommand remote: remote, command: "docker rm backend mysqldb frontend || true"
                               sshCommand remote: remote, command: "docker rmi ${DOCKER_REGISTRY}/devops/api:staging ${DOCKER_REGISTRY}/devops/ui:staging || true"
                               sshCommand remote: remote, command: "docker run -d -p 3306:3306 \
-                              -e MYSQL_DATABASE=test -e MYSQL_ROOT_PASSWORD=tooor -e MYSQL_USER=test -e MYSQL_PASSWORD=test \
+                              -e MYSQL_DATABASE=${MYSQL_DB_NAME} -e MYSQL_ROOT_PASSWORD=${MYSQL_DB_ROOT} -e MYSQL_USER=${MYSQL_DB_USER} -e MYSQL_PASSWORD=${MYSQL_DB_PASSWORD} \
                               -v /home/vagrant/mysql:/var/lib/mysql \
                               --name mysqldb mysql \
                               --default-authentication-plugin=mysql_native_password"
@@ -107,7 +110,7 @@ pipeline {
                 remote.allowAnyHosts = true
                 remote.host = 'staging.local'
                 remote.identityFile = '~/.ssh/staging.key'
-                sshCommand remote: remote, command: "docker run -d -p 8080:8080 --link mysqldb -e MYSQL_USER=test -e MYSQL_PASSWORD=test \
+                sshCommand remote: remote, command: "docker run -d -p 8080:8080 --link mysqldb -e MYSQL_DB_USER=${MYSQL_DB_USER} -e MYSQL_DB_PASSWORD=${MYSQL_DB_PASSWORD} \
                 -e MYSQL_JDBC_URL=${MYSQL_STAGING_URL} -e MYSQL_DB_NAME=${MYSQL_DB_NAME} --name backend ${DOCKER_REGISTRY}/devops/api:staging"
                 sshCommand remote: remote, command: "docker run -d -p 80:80 --link backend \
                   --name frontend ${DOCKER_REGISTRY}/devops/ui:staging"                  
