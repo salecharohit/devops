@@ -55,10 +55,11 @@ public class JPAConfig {
 
 	@Bean
 	public DataSource dataSource() {
+		String url = "jdbc:mysql://"+connectionUrl+"/"+mysql_db_name ;
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		Credentials creds = getDBCredentials();
 		dataSource.setDriverClassName(dbDriver);
-		dataSource.setUrl("jdbc:mysql://"+connectionUrl+"/"+mysql_db_name);
+		dataSource.setUrl(url);
 		dataSource.setUsername(creds.getUsername());
 		dataSource.setPassword(creds.getPassword());
 		return dataSource;
