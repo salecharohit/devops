@@ -2,12 +2,13 @@ package com.rohitsalecha.springular.devops.config;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +31,7 @@ import org.springframework.vault.support.VaultResponseSupport;
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = "com.rohitsalecha.springular.devops")
 public class JPAConfig {
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private Environment env;
@@ -96,7 +98,7 @@ public class JPAConfig {
 			userName = System.getenv("MYSQL_DB_USER");
 			password = System.getenv("MYSQL_DB_PASSWORD");
 		} else {
-
+			logger.info("Vault Address: "+vault_addr);
 			VaultEndpoint endpoint = null;
 			try {
 
@@ -104,15 +106,19 @@ public class JPAConfig {
 			} catch (URISyntaxException e1) {
 				e1.printStackTrace();
 			}
+			String token=System.getenv("VAULT_TOKEN_MYSQL");
+			String path =System.getenv("VAULT_PATH_MYSQL");
 			VaultTemplate vaultTemplate = new VaultTemplate(endpoint,
-					new TokenAuthentication(System.getenv("VAULT_TOKEN_MYSQL")));
-			VaultResponseSupport<Credentials> response = vaultTemplate.read(System.getenv("VAULT_PATH_MYSQL"),
+					new TokenAuthentication(token));
+			logger.info("Vault Token: "+token);
+			VaultResponseSupport<Credentials> response = vaultTemplate.read(path,
 					Credentials.class);
+			logger.info("Vault Path: "+path);
 			userName = response.getData().getUsername();
 			password = response.getData().getPassword();
 
 		}
-		
+		logger.debug("DB UserName: "+userName);
 		return new Credentials(userName,password);
 	}
 
