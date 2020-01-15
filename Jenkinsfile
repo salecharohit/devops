@@ -16,7 +16,7 @@ pipeline {
       stage('Build') {
          steps {
             sh '''
-#               docker images -f dangling=true -q | xargs docker rmi || true
+               docker images -f dangling=true -q | xargs docker rmi || true
                mvn -f backend/pom.xml clean package
                npm --prefix frontend install
             '''   
