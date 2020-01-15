@@ -2,7 +2,7 @@ pipeline {
    agent any
    environment {
      DOCKER_REGISTRY = "registry.local:5000"
-     VAULT_ADDR = "vault.local:8200"
+     VAULT_ADDR = "http://vault.local:8200"
      VAULT_PATH_MYSQL="kv/mysql/db"
      VAULT_TOKEN_MYSQL="s.OLICv1xFjl7T0pWyakJL4MLi"
      MYSQL_STAGING_URL="staging.local:3306"
@@ -158,7 +158,8 @@ pipeline {
                         sshCommand remote: remote, command: "docker stop mysqldb backend frontend || true"
                         sshCommand remote: remote, command: "docker rm backend mysqldb frontend || true"
                         sshCommand remote: remote, command: "docker run -d -p 3306:3306 \
-                        -e MYSQL_DATABASE=test -e MYSQL_ROOT_PASSWORD=${mysqlroot} -e MYSQL_USER=test -e MYSQL_PASSWORD=${mysqldbpw} \
+                        -e MYSQL_DATABASE=${MYSQL_DB_NAME} -e MYSQL_ROOT_PASSWORD=${mysqlroot} \
+                        -e MYSQL_USER=${MYSQL_DB_NAME} -e MYSQL_PASSWORD=${mysqldbpw} \
                         -v /home/vagrant/mysql:/var/lib/mysql \
                         --name mysqldb mysql \
                         --default-authentication-plugin=mysql_native_password"
@@ -178,7 +179,8 @@ pipeline {
                 remote.host = 'production.local'
                 remote.identityFile = '~/.ssh/production.key'
                 sshCommand remote: remote, command: "docker run -d -p 8080:8080 --link mysqldb \
-                   -e VAULT_TOKEN_MYSQL=${VAULT_TOKEN_MYSQL} -e MYSQL_DB_NAME=${MYSQL_DB_NAME} -e VAULT_PATH_MYSQL=${VAULT_PATH_MYSQL} -e MYSQL_JDBC_URL=${MYSQL_PROD_URL} -e VAULT_ADDR=${VAULT_ADDR} \
+                   -e VAULT_TOKEN_MYSQL=${VAULT_TOKEN_MYSQL} -e MYSQL_DB_NAME=${MYSQL_DB_NAME} \
+                   -e VAULT_PATH_MYSQL=${VAULT_PATH_MYSQL} -e MYSQL_JDBC_URL=${MYSQL_PROD_URL} -e VAULT_ADDR=${VAULT_ADDR} \
                   --name backend ${DOCKER_REGISTRY}/devops/api:prod"
                 sshCommand remote: remote, command: "docker run -d -p 80:80 --link backend \
                   --name frontend ${DOCKER_REGISTRY}/devops/ui:prod"                  
