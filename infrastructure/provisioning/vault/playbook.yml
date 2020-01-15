@@ -35,8 +35,8 @@
       shell: "{{ item }}"
       loop:
         - "vault secrets enable kv || true"
-        - "vault kv put {{vault_mysql_root_policy_path}} root={{mysql_root_password}}"
-        - "vault kv put {{vault_mysql_db_policy_path}} db={{mysql_db_password}}"
+        - "vault kv put {{vault_mysql_root_policy_path}} username=root password={{mysql_root_password}}"
+        - "vault kv put {{vault_mysql_db_policy_path}} username=test password={{mysql_db_password}}"
         - "echo 'path \"{{vault_mysql_root_policy_path}}\" { capabilities = [\"read\",\"list\"] }' | vault policy write {{vault_mysql_root_policy_name}} -"
         - "echo 'path \"{{vault_mysql_db_policy_path}}\" { capabilities = [\"read\",\"list\"] }' | vault policy write {{vault_mysql_db_policy_name}} -"
       environment:
