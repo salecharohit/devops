@@ -5,6 +5,10 @@ public class Credentials {
 	private String username;
 	private String password;
 
+	public Credentials() {
+		// TODO Auto-generated constructor stub
+	}
+	
 	public Credentials(String userName2, String password2) {
 		this.username=userName2;
 		this.password=password2;

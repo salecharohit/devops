@@ -2,6 +2,7 @@ package com.rohitsalecha.springular.devops.config;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
