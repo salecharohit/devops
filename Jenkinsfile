@@ -4,9 +4,10 @@ pipeline {
      DOCKER_REGISTRY = "registry.local:5000"
      VAULT_ADDR = "vault.local:8200"
      VAULT_PATH_MYSQL="kv/mysql/db"
-     VAULT_TOKEN_MYSQL="s.cYaP67g7Fo8dZzO8snWWRszE"
+     VAULT_TOKEN_MYSQL="s.OLICv1xFjl7T0pWyakJL4MLi"
      MYSQL_STAGING_URL="staging.local:3306"
      MYSQL_PROD_URL="production.local:3306"
+     MYSQL_DB_NAME="test"
    }
    stages {
       stage('Build') {
@@ -106,7 +107,7 @@ pipeline {
                 remote.host = 'staging.local'
                 remote.identityFile = '~/.ssh/staging.key'
                 sshCommand remote: remote, command: "docker run -d -p 8080:8080 --link mysqldb -e MYSQL_USER=test -e MYSQL_PASSWORD=test \
-                -e MYSQL_JDBC_URL=${MYSQL_STAGING_URL} --name backend ${DOCKER_REGISTRY}/devops/api:staging"
+                -e MYSQL_JDBC_URL=${MYSQL_STAGING_URL} -e MYSQL_DB_NAME=${MYSQL_DB_NAME} --name backend ${DOCKER_REGISTRY}/devops/api:staging"
                 sshCommand remote: remote, command: "docker run -d -p 80:80 --link backend \
                   --name frontend ${DOCKER_REGISTRY}/devops/ui:staging"                  
             }
@@ -173,7 +174,7 @@ pipeline {
                 remote.host = 'production.local'
                 remote.identityFile = '~/.ssh/production.key'
                 sshCommand remote: remote, command: "docker run -d -p 8080:8080 --link mysqldb \
-                   -e VAULT_TOKEN_MYSQL=${VAULT_TOKEN_MYSQL} -e VAULT_PATH_MYSQL=${VAULT_PATH_MYSQL} -e MYSQL_JDBC_URL=${MYSQL_PROD_URL} -e VAULT_ADDR=${VAULT_ADDR} \
+                   -e VAULT_TOKEN_MYSQL=${VAULT_TOKEN_MYSQL} -e MYSQL_DB_NAME=${MYSQL_DB_NAME} -e VAULT_PATH_MYSQL=${VAULT_PATH_MYSQL} -e MYSQL_JDBC_URL=${MYSQL_PROD_URL} -e VAULT_ADDR=${VAULT_ADDR} \
                   --name backend ${DOCKER_REGISTRY}/devops/api:prod"
                 sshCommand remote: remote, command: "docker run -d -p 80:80 --link backend \
                   --name frontend ${DOCKER_REGISTRY}/devops/ui:prod"                  

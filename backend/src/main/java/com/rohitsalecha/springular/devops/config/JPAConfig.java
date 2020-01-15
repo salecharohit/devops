@@ -34,6 +34,7 @@ public class JPAConfig {
 	private Environment env;
 	private static String dbDriver = "com.mysql.cj.jdbc.Driver";
 	private static String connectionUrl = System.getenv("MYSQL_JDBC_URL");
+	private static String mysql_db_name = System.getenv("MYSQL_DB_NAME");
 	private static String vault_addr = System.getenv("VAULT_ADDR");
 
 	@Bean
@@ -57,7 +58,7 @@ public class JPAConfig {
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		Credentials creds = getDBCredentials();
 		dataSource.setDriverClassName(dbDriver);
-		dataSource.setUrl(connectionUrl);
+		dataSource.setUrl("jdbc:mysql://"+connectionUrl+"/"+mysql_db_name);
 		dataSource.setUsername(creds.getUsername());
 		dataSource.setPassword(creds.getPassword());
 		return dataSource;
