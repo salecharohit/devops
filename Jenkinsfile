@@ -157,6 +157,7 @@ pipeline {
                         remote.identityFile = '~/.ssh/production.key'
                         sshCommand remote: remote, command: "docker stop mysqldb backend frontend || true"
                         sshCommand remote: remote, command: "docker rm backend mysqldb frontend || true"
+                        sshCommand remote: remote, command: "docker rmi ${DOCKER_REGISTRY}/devops/api:prod ${DOCKER_REGISTRY}/devops/ui:prod || true"
                         sshCommand remote: remote, command: "docker run -d -p 3306:3306 \
                         -e MYSQL_DATABASE=${MYSQL_DB_NAME} -e MYSQL_ROOT_PASSWORD=${mysqlroot} \
                         -e MYSQL_USER=${MYSQL_DB_NAME} -e MYSQL_PASSWORD=${mysqldbpw} \
