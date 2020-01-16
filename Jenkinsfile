@@ -101,10 +101,10 @@ pipeline {
                      )
                }
       }
-      stage('Staging Deploy') {
-         steps {// Allow MySQL Server to start
-            sleep time: 250, unit: 'MILLISECONDS'
-         }
+      stage('Staging Deploy') {//providing delay for mysql to start
+         sh '''
+		         sleep 250
+            '''
          steps {   
             script {
                 def remote = [:]
@@ -175,11 +175,9 @@ pipeline {
          }
       }
       stage ('Production Deploy Approval') {
-         steps {
-         script {
-            input message: 'Do you approve Deployment ?', ok: 'OK'
-            }
-         }
+         sh '''
+		         sleep 250
+            '''
       }      
       stage('Production Deploy') {
          steps {// Allow MySQL Server to start
