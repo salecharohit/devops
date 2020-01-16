@@ -104,7 +104,7 @@ pipeline {
       stage('Staging Deploy') {//providing delay for mysql to start
          steps {   
             sh '''
-		            sleep 250
+		            sleep 10
                '''
             script {
                 def remote = [:]
