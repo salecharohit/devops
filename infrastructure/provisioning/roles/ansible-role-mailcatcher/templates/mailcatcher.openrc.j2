@@ -1,0 +1,9 @@
+#!/sbin/openrc-run
+
+depend() {
+    need net
+}
+
+command="/usr/bin/mailcatcher"
+command_args=" --ip={{ mailcatcher_ip }} --smtp-ip={{ mailcatcher_smtp_ip }} --smtp-port={{ mailcatcher_smtp_port }} --http-ip={{ mailcatcher_http_ip }} --http-port={{ mailcatcher_http_port }}"
+pidfile="/run/${RC_SVCNAME}/pid"

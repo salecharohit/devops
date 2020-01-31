@@ -34,11 +34,11 @@
       (docker_insecure_registry_access is defined and docker_insecure_registry_access.changed)
 
   roles:
-    - role: provisioning/roles/geerlingguy.docker
+    - role: infrastructure/provisioning/roles/geerlingguy.docker
       become: yes
       vars:
         docker_users: [vagrant]
-    - role: provisioning/roles/geerlingguy.pip
+    - role: infrastructure/provisioning/roles/geerlingguy.pip
       vars: 
         pip_install_packages:
         - name: docker-py

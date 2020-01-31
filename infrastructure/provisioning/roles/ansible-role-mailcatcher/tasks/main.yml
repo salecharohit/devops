@@ -1,3 +1,8 @@
 ---
 - include: create_user.yml
-- include: install_mailcatcher.yml
+
+- include_tasks: setup-Debian.yml
+  when: ansible_os_family == 'Debian'
+
+- include_tasks: setup-Alpine.yml
+  when: ansible_os_family == 'Alpine'

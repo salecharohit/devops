@@ -1,0 +1,11 @@
+---
+- name: Installs an ElasticSearch Server
+  gather_facts: True
+  hosts: all
+
+  tasks:
+    - include_tasks: install.yml
+
+  roles:
+  - role: infrastructure/provisioning/roles/geerlingguy.java
+    become: yes

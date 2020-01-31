@@ -1,0 +1,40 @@
+- name: Install mailcatcher dependencies
+  apk:
+    state: present
+    update_cache: yes    
+    name: ['libstdc++','ruby','ruby-bigdecimal','ruby-etc','ruby-json','sqlite-libs','yaml']
+
+- name: Install Dependencies
+  command: apk add --update --no-cache --virtual .build-deps make g++ gcc sqlite-dev ruby-dev
+
+- name: Install Mailcatcher
+  command: gem install mailcatcher --no-ri --no-rdoc
+  register: get_result
+  until: get_result is success
+  retries: 5
+  delay: 2
+  ignore_errors: true  
+
+- name: Remove Dependencies
+  command: apk del .build-deps
+
+- name: Copy systemd init file
+  template:
+    src: mailcatcher.openrc.j2
+    dest: /etc/init.d/mailcatcher
+    owner: root
+    group: root
+    mode: a+x
+
+- name: check if Mailcatcher Service file is configured
+  stat: 
+    path: /etc/init.d/mailcatcher
+  register: mailcatcher_file_exists
+
+- name: Starting and Enabling mailcatcher service
+  service:
+    name: mailcatcher
+    state: started
+    enabled: yes     
+  become: yes
+  when: mailcatcher_file_exists.stat.exists == false  

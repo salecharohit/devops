@@ -1,0 +1,78 @@
+
+    # In order to push docker images to insecure registry special configuration is required.
+    # https://docs.docker.com/registry/insecure/
+    - name: Configure Jenkins to Access insecure docker registry
+      template:
+        src: daemon.json
+        dest: "/etc/docker/daemon.json"
+        owner: "{{ jenkins_process_user }}"
+        group: "{{ jenkins_process_group }}"
+        mode: 0777
+      register: docker_insecure_registry_access
+      when:
+        - docker_insecure_registry_domain | length > 0
+      become: yes        
+
+    - name: Create a .ssh Directory before copying Keys
+      file:
+        path: "{{jenkins_home}}/.ssh"
+        state: directory
+        recurse: yes
+        owner: "{{ jenkins_process_user }}"
+        group: "{{ jenkins_process_group }}"
+      become: yes        
+
+#This is a very important step as the files being downloaded in workspace cease to take Jenkin's users permissions.
+# sudo chown -R jenkins:jenkins /var/lib/jenkins/
+    - name: Recursively Apply Permissions for Jenkins user in the jenkins home folder
+      file:
+        path: "{{jenkins_home}}"
+        state: directory
+        recurse: yes
+        owner: "{{ jenkins_process_user }}"
+        group: "{{ jenkins_process_group }}"
+      become: yes         
+
+    - name: Copy Private SSH Key of Staging Server for SSH Access
+      copy:
+        src: /vagrant/.vagrant/machines/staging.local/virtualbox/private_key
+        dest: "{{jenkins_home}}/.ssh/staging.key"
+        owner: "{{ jenkins_process_user }}"
+        group: "{{ jenkins_process_group }}"
+        mode: 0644
+      become: yes 
+
+    - name: Copy Private SSH Key of Production Server for SSH Access
+      copy:
+        src: /vagrant/.vagrant/machines/production.local/virtualbox/private_key
+        dest: "{{jenkins_home}}/.ssh/production.key"
+        owner: "{{ jenkins_process_user }}"
+        group: "{{ jenkins_process_group }}"
+        mode: 0644
+      become: yes 
+
+    - name: Copy Private SSH Key of Archiver Server for SSH Access
+      copy:
+        src: /vagrant/.vagrant/machines/archiver.local/virtualbox/private_key
+        dest: "{{jenkins_home}}/.ssh/archiver.key"
+        owner: "{{ jenkins_process_user }}"
+        group: "{{ jenkins_process_group }}"
+        mode: 0644
+      become: yes      
+
+    - name: Immediately restart Docker for accessing insecure registry.
+      service: name=docker state=restarted
+      become: yes 
+
+    - name: Restart Jenkins as it is giving Docker Daemon Error on startup
+      service: name=jenkins state=restarted
+      become: yes
+
+    - name: Pre Pull Docker Images So that Jenkins Jobs run Faster
+      command: "docker pull {{ item }}"
+      with_items:
+        - "{{pre_pull_docker_images}}"
+      register: pulling_docker
+      retries: 5
+      until: pulling_docker is not failed
+      become: yes      

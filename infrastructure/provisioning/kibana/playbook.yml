@@ -1,0 +1,18 @@
+---
+- name: Installs a Kibana Server
+  gather_facts: True
+  hosts: all
+
+  roles:
+  - role: provisioning/roles/geerlingguy.kibana
+    vars:
+      kibana_version: "7.x"
+      kibana_package: kibana
+      kibana_package_state: present
+      kibana_service_state: started
+      kibana_service_enabled: true
+      kibana_server_port: 5600
+      kibana_server_host: "0.0.0.0"
+      kibana_elasticsearch_url: "http://elastic.local:9200"
+      kibana_elasticsearch_username: "kibana"
+      kibana_elasticsearch_password: "kibana"

@@ -68,4 +68,4 @@
 
 # Modified from https://github.com/MiteshSharma/AnsibleVaultRole
   roles:
-    - role: provisioning/roles/hashicorp-vault
+    - role: infrastructure/provisioning/roles/hashicorp-vault

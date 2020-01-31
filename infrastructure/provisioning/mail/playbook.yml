@@ -4,5 +4,5 @@
   hosts: all
 
   roles:
-  - role: provisioning/roles/ansible-role-mailcatcher
+  - role: infrastructure/provisioning/roles/ansible-role-mailcatcher
     become: yes

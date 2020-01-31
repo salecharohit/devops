@@ -1,0 +1,8 @@
+---
+- name: Installs a Central Logstash Server
+  gather_facts: True
+  hosts: all
+
+  roles:
+  - role: infrastructure/provisioning/roles/geerlingguy.java
+    become: yes
