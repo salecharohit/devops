@@ -3,6 +3,9 @@
   gather_facts: True
   hosts: all
 
+  tasks:
+    - import_tasks: install.yml
+
   roles:
   - role: infrastructure/provisioning/roles/geerlingguy.java
     become: yes
