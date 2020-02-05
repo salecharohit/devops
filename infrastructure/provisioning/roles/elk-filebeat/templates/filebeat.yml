@@ -8,10 +8,8 @@ filebeat.inputs:
 - type: log
   enabled: true
   paths:
-{% for item in log_file_locations %}  
-    -  {{ item }}
-{% endfor %}
+    - "/home/vagrant/logs/*.log"
 output.logstash:
   enabled: true
-  hosts: ["{{logstash_server}}"]
+  hosts: ["logstash.local:5000"]
   ssl.enabled: false

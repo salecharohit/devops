@@ -44,5 +44,5 @@
         - name: docker-py
     - role: infrastructure/provisioning/roles/elk-filebeat
       vars:
-        log_file_locations: ["/home/vagrant/logs"]
+        log_file_locations: ["/home/vagrant/logs/*.log"]
         logstash_server: "logstash.local:5000"

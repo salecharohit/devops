@@ -17,18 +17,11 @@
       - filebeat
 
 - name: Copy the config file
+  command: 'filebeat modules enable logstash nginx'
+
+- name: Copy the config file
   template:
     src: filebeat.yml.j2
     dest: "/etc/filebeat/filebeat.yml"
-    
-- name: Starting and Enabling filebeat service
-  service:
-    name: filebeat
-    state: started
-    enabled: yes
-  changed_when: false
-  register: get_result
-  until: get_result is success
-  retries: 3
-  delay: 2
+  notify: Restart Filebeat
 

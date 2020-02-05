@@ -3,4 +3,14 @@
 - name: Reload systemd
   command: systemctl daemon-reload
   listen: systemd_reload
-  become: yes
+  
+- name: Restart Kibana
+  service:
+    name: kibana
+    state: started
+    enabled: yes
+  changed_when: false
+  register: get_result
+  until: get_result is success
+  retries: 3
+  delay: 2

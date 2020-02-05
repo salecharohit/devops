@@ -20,15 +20,5 @@
   template:
     src: elasticsearch.yml.j2
     dest: "/etc/elasticsearch/elasticsearch.yml"
-
-- name: Starting and Enabling elasticsearch service
-  service:
-    name: elasticsearch
-    state: started
-    enabled: yes
-  changed_when: false
-  register: get_result
-  until: get_result is success
-  retries: 3
-  delay: 2
+  notify: Restart Elasticsearch
 

@@ -16,19 +16,14 @@
       - apt-transport-https
       - logstash
 
-- name: Copy the config file
+- name: Copy the logstash config file
   template:
-    src: logstash.conf.j2
-    dest: "/etc/logstash/conf.d/logstash.conf"
+    src: logstash.yml
+    dest: "/etc/logstash/logstash.yml"
 
-- name: Starting and Enabling logstash service
-  service:
-    name: logstash
-    state: started
-    enabled: yes
-  changed_when: false
-  register: get_result
-  until: get_result is success
-  retries: 3
-  delay: 2
+- name: Copy the springular.conf file
+  template:
+    src: springular.conf.j2
+    dest: "/etc/logstash/conf.d/springular.conf"
+  notify: Restart Logstash
 

@@ -4,3 +4,14 @@
   command: systemctl daemon-reload
   listen: systemd_reload
   become: yes
+
+- name: Restart Elasticsearch
+  service:
+    name: elasticsearch
+    state: started
+    enabled: yes
+  changed_when: false
+  register: get_result
+  until: get_result is success
+  retries: 3
+  delay: 2

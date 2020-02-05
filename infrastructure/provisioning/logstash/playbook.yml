@@ -8,5 +8,5 @@
     become: yes
   - role: infrastructure/provisioning/roles/elk-logstash
     vars:
-      elasticsearch_server: elastic.local:9200
+      elasticsearch_server: http://elastic.local:9200
     become: yes    

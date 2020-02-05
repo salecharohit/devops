@@ -20,15 +20,5 @@
   template:
     src: kibana.yml.j2
     dest: "/etc/kibana/kibana.yml"
-
-- name: Starting and Enabling kibana service
-  service:
-    name: kibana
-    state: started
-    enabled: yes
-  changed_when: false
-  register: get_result
-  until: get_result is success
-  retries: 3
-  delay: 2
+  notify: Restart Kibana
 
