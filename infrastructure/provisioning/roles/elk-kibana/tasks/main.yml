@@ -1,0 +1,6 @@
+---
+# tasks file for Kibana
+- include_tasks: install.yml
+  when:
+    - kibana_server | length > 0
+    - elasticsearch_server | length > 0    

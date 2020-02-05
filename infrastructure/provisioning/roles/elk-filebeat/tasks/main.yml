@@ -1,0 +1,6 @@
+---
+# tasks file for filebeat installation
+- include_tasks: install.yml
+  when:
+    - log_file_locations | length > 0
+    - logstash_server | length > 0

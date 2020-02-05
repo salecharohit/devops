@@ -1,0 +1,28 @@
+input
+{
+    beats
+    {
+        ssl => false
+        port => 5000
+    }
+}
+filter {
+   if [tags][json] {
+      json {
+        source => "message"
+      }
+    }
+ }
+output {
+  # stdout { codec => rubydebug }
+   file {
+      path => /home/vagrant/logstash.log
+      codec => rubydebug
+   }
+    elasticsearch {
+      hosts => [{{elasticsearch_server}}]
+      manage_template => false
+      index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+      document_type => "%{[@metadata][type]}"
+   }
+}

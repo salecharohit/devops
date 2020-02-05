@@ -1,0 +1,34 @@
+- name: Add an Apt signing key, uses whichever key is at the URL
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+
+- name: Add an Apt signing key, uses whichever key is at the URL
+  apt_repository:
+    repo: deb https://artifacts.elastic.co/packages/7.x/apt stable main
+    state: present
+
+- name: Install Kibana and pre-requisites
+  package:
+    name: "{{ item }}"
+    update_cache: yes
+  with_items:
+      - apt-transport-https
+      - kibana
+
+- name: Copy the config file
+  template:
+    src: kibana.yml.j2
+    dest: "/etc/kibana/kibana.yml"
+
+- name: Starting and Enabling kibana service
+  service:
+    name: kibana
+    state: started
+    enabled: yes
+  changed_when: false
+  register: get_result
+  until: get_result is success
+  retries: 3
+  delay: 2
+

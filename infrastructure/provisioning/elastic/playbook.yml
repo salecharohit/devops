@@ -3,9 +3,11 @@
   gather_facts: True
   hosts: all
 
-  # tasks:
-  #   - include_tasks: install.yml
-
   roles:
   - role: infrastructure/provisioning/roles/geerlingguy.java
     become: yes
+  - role: infrastructure/provisioning/roles/elk-elasticsearch
+    vars:
+      elasticsearch_server: elastic.local
+      elasticsearch_server_port: 9200
+    become: yes       

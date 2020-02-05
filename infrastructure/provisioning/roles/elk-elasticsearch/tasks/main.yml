@@ -1,0 +1,5 @@
+---
+# tasks file for elastic search
+- include_tasks: install.yml
+  when:
+    - elasticsearch_server | length > 0

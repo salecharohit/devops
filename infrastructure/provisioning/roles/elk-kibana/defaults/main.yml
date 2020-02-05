@@ -1,0 +1,4 @@
+---
+kibana_server: localhost
+kibana_server_port: 5601
+elasticsearch_server: "localhost:9200"
