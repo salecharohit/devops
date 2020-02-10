@@ -13,6 +13,6 @@ public class WebConfig implements WebMvcConfigurer  {
 	private RequestInterceptor requestInterceptor;
 	
     public void addInterceptors(InterceptorRegistry registry){
-        registry.addInterceptor(requestInterceptor);
+        registry.addInterceptor(requestInterceptor).addPathPatterns("/**");
     }
 }
