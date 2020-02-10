@@ -1,36 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
- 
-    <property name="LOGS" value="./logs" />
- 
-    <appender name="Console"
-        class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>
-                %white(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable
-            </Pattern>
-        </layout>
-    </appender>
- 
-    <appender name="STASH" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOGS}/springular.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>springular.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>7</maxHistory>
-        </rollingPolicy>  
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
-    </appender>
-     
-    <!-- LOG everything at INFO level -->
-    <root level="info">
-        <appender-ref ref="STASH" />
-        <appender-ref ref="Console" />
-    </root>
- 
-    <!-- LOG "com.rohitsalecha*" at TRACE level -->
-    <logger name="com.rohitsalecha" level="trace" additivity="false">
-        <appender-ref ref="STASH" />
-        <appender-ref ref="Console" />
-    </logger>
- 
+
+	<property name="LOGS" value="./logs" />
+
+	<appender name="Console"
+		class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>
+				%white(%d{ISO8601}) %highlight(%-5level) [%blue(%t)]
+				%yellow(%C{1.}): %msg%n%throwable
+			</Pattern>
+		</layout>
+	</appender>
+
+	<appender name="STASH" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOGS}/springular.log</file>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>springular.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<maxHistory>7</maxHistory>
+		</rollingPolicy>
+		<encoder class="net.logstash.logback.encoder.LogstashEncoder">
+		<providers>
+			<timestamp>
+				<fieldName>ts</fieldName>
+				<timeZone>UTC</timeZone>
+			</timestamp>
+			<loggerName/>			
+             <callerData>
+                 <classFieldName>class</classFieldName>
+                 <methodFieldName>method</methodFieldName>
+                 <lineFieldName>line</lineFieldName>
+                 <fileFieldName>file</fileFieldName>
+             </callerData>
+			<message/>             
+			<stackHash>
+			    <fieldName>exception-hash</fieldName>
+			</stackHash>
+			<stackTrace>
+			    <fieldName>exception</fieldName>
+			    <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+			        <shortenedClassNameLength>short</shortenedClassNameLength>
+			        <maxDepthPerThrowable>short</maxDepthPerThrowable>
+			        <maxLength>short</maxLength>
+			        <rootCauseFirst>true</rootCauseFirst>
+			        <exclude>sun\.reflect\..*\.invoke.*</exclude>
+			    </throwableConverter>
+			</stackTrace>
+		</providers>			
+		</encoder>
+		<encoder class="net.logstash.logback.encoder.LogstashAccessEncoder">
+		<providers>
+			<method/>
+			<requested_url/>
+			<protocol/>
+			<requestedUrl/>
+			<remoteHost/>
+		</providers>		
+		</encoder>
+	</appender>
+
+	<!-- LOG everything at INFO level -->
+	<!-- <root level="info"> -->
+	<!-- <appender-ref ref="STASH" /> -->
+	<!-- <appender-ref ref="Console" /> -->
+	<!-- </root> -->
+
+	<!-- LOG "com.rohitsalecha*" at TRACE level -->
+	<logger name="com.rohitsalecha" level="info" additivity="false">
+		<appender-ref ref="STASH" />
+		<appender-ref ref="Console" />
+	</logger>
+
 </configuration>
