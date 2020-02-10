@@ -14,7 +14,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   plugin_installed = false
   required_plugins.each do |plugin|
     unless Vagrant.has_plugin?(plugin)
-      system "vagrant plugin install #{plugin}"
+          system "vagrant plugin install #{plugin}"  
       plugin_installed = true
     end
   end

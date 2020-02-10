@@ -15,6 +15,10 @@
   with_items:
       - apt-transport-https
       - filebeat
+  register: get_result
+  until: get_result is success
+  retries: 3
+  delay: 2          
 
 - name: Copy the config file
   command: 'filebeat modules enable logstash nginx'

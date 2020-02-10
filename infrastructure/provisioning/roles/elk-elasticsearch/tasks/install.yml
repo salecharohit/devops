@@ -8,14 +8,20 @@
     repo: deb https://artifacts.elastic.co/packages/7.x/apt stable main
     state: present
 
-- name: Install elasticsearch and pre-requisites
+- name: Install pre-requisites
   package:
-    name: "{{ item }}"
+    name: apt-transport-https
     update_cache: yes
-  with_items:
-      - apt-transport-https
-      - elasticsearch
 
+- name: Install elasticsearch
+  package:
+    name: elasticsearch
+    update_cache: yes
+  register: get_result
+  until: get_result is success
+  retries: 3
+  delay: 2          
+  
 - name: Copy the config file
   template:
     src: elasticsearch.yml.j2

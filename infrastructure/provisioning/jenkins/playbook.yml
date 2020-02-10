@@ -18,6 +18,7 @@
         update_cache: yes
       with_items:
           - jq
+          - apt-transport-https
       become: yes      
 
     - import_tasks: jenkins.yml
