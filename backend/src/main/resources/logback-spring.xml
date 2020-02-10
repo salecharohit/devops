@@ -49,22 +49,13 @@
 			</stackTrace>
 		</providers>			
 		</encoder>
-		<encoder class="net.logstash.logback.encoder.LogstashAccessEncoder">
-		<providers>
-			<method/>
-			<requested_url/>
-			<protocol/>
-			<requestedUrl/>
-			<remoteHost/>
-		</providers>		
-		</encoder>
 	</appender>
 
 	<!-- LOG everything at INFO level -->
-	<!-- <root level="info"> -->
-	<!-- <appender-ref ref="STASH" /> -->
-	<!-- <appender-ref ref="Console" /> -->
-	<!-- </root> -->
+	<root level="info">
+	<appender-ref ref="STASH" />
+	<appender-ref ref="Console" />
+	</root>
 
 	<!-- LOG "com.rohitsalecha*" at TRACE level -->
 	<logger name="com.rohitsalecha" level="info" additivity="false">
