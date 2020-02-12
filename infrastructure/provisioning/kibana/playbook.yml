@@ -6,7 +6,7 @@
   roles:
   - role: infrastructure/provisioning/roles/elk-kibana
     vars:
-      kibana_server: kibana.local
+      kibana_server: 0.0.0.0
       kibana_server_port: 5601
       elasticsearch_server: "http://elastic.local:9200"
     become: yes   
