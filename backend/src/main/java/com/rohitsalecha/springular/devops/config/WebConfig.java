@@ -11,12 +11,7 @@ import com.rohitsalecha.springular.devops.interceptor.LoggableDispatcherServlet;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer  {
-//	@Autowired
-//	private RequestInterceptor requestInterceptor;
-	
-//    public void addInterceptors(InterceptorRegistry registry){
-//        registry.addInterceptor(requestInterceptor).addPathPatterns("*/**");
-//    }
+
     @Bean
     public ServletRegistrationBean dispatcherRegistration() {
         return new ServletRegistrationBean(dispatcherServlet());

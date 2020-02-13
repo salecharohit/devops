@@ -27,12 +27,6 @@
 				<timeZone>UTC</timeZone>
 			</timestamp>
 			<loggerName/>			
-             <callerData>
-                 <classFieldName>class</classFieldName>
-                 <methodFieldName>method</methodFieldName>
-                 <lineFieldName>line</lineFieldName>
-                 <fileFieldName>file</fileFieldName>
-             </callerData>
 			<message/>             
 			<stackHash>
 			    <fieldName>exception-hash</fieldName>

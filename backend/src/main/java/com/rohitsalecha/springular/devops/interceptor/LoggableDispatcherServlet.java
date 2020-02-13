@@ -2,6 +2,9 @@ package com.rohitsalecha.springular.devops.interceptor;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,16 +53,27 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
         jsonObject.addProperty("httpMethod", requestToCache.getMethod());
         jsonObject.addProperty("clientIP", requestToCache.getRemoteAddr());
         jsonObject.addProperty("javaMethod", handler.toString());
-        if (status > 299) {
-            String requestBody = null;
-            try {
-                requestBody = requestToCache.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-            } catch (IOException e) {
-                e.printStackTrace();
+        jsonObject.addProperty("queryString", requestToCache.getQueryString());
+        
+        Enumeration<String> headerNames = requestToCache.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String key = (String) headerNames.nextElement();
+            String value = requestToCache.getHeader(key);
+            if(key.equalsIgnoreCase("JSESSIONID")) {
+            	jsonObject.addProperty(key,"");
             }
-            jsonObject.addProperty("requestBody", requestBody);
-            jsonObject.addProperty("requestParams", requestToCache.getQueryString());
+            else {
+                jsonObject.addProperty(key,value);
+            }
         }
+        
+        Enumeration<String> parameterNames = requestToCache.getParameterNames();
+        while (parameterNames.hasMoreElements()) {
+            String key = (String) parameterNames.nextElement();
+            String value = requestToCache.getParameter(key);
+            jsonObject.addProperty(key,value);
+        }
+        
         
         logger.info(jsonObject.toString());
     }
