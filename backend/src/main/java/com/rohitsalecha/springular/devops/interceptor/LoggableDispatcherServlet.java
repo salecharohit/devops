@@ -77,7 +77,7 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
         }
         if (!httpMethod.equalsIgnoreCase("GET")) {
         	try {
-				jsonObject.addProperty("requestBody",getBody(requestToCache));
+				jsonObject.add("requestBody",jsonObject.getAsJsonObject(getBody(requestToCache)));
 			} catch (IOException e) {
 				logger.error(e.getStackTrace().toString());
 			}
@@ -96,7 +96,7 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
                     return new String(buf, 0, length, wrapper.getCharacterEncoding());
                 }
                 catch (UnsupportedEncodingException ex) {
-                    // NOOP
+        			logger.error(ex.getStackTrace().toString());
                 }
             }
         }
@@ -109,37 +109,17 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
         responseWrapper.copyBodyToResponse();
     }    
     
-    public static String getBody(HttpServletRequest request) throws IOException {
+    public String getBody(HttpServletRequest request) throws IOException {
 
-        String body = null;
-        StringBuilder stringBuilder = new StringBuilder();
-        BufferedReader bufferedReader = null;
-
-        try {
-            InputStream inputStream = request.getInputStream();
-            if (inputStream != null) {
-                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                char[] charBuffer = new char[128];
-                int bytesRead = -1;
-                while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
-                    stringBuilder.append(charBuffer, 0, bytesRead);
-                }
-            } else {
-                stringBuilder.append("");
-            }
-        } catch (IOException ex) {
-            throw ex;
-        } finally {
-            if (bufferedReader != null) {
-                try {
-                    bufferedReader.close();
-                } catch (IOException ex) {
-                    throw ex;
-                }
-            }
-        }
-
-        body = stringBuilder.toString();
-        return body;
+    	StringBuilder jsonBuff = new StringBuilder();
+    	String line = null;
+    	try {
+    	    BufferedReader reader = request.getReader();
+    	    while ((line = reader.readLine()) != null)
+    	        jsonBuff.append(line);
+    	} catch (Exception e) { 
+			logger.error(e.getStackTrace().toString());
+    	}
+    	return jsonBuff.toString();
     }
 }
