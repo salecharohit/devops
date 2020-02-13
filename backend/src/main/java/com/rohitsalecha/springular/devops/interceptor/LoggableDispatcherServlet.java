@@ -1,11 +1,11 @@
 package com.rohitsalecha.springular.devops.interceptor;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,9 +48,10 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
     private void log(HttpServletRequest requestToCache, HttpServletResponse responseToCache, HandlerExecutionChain handler) {
         JsonObject jsonObject = new JsonObject();
         int status = responseToCache.getStatus();
+        String httpMethod = requestToCache.getMethod();
         jsonObject.addProperty("httpStatus",status);
         jsonObject.addProperty("path", requestToCache.getRequestURI());
-        jsonObject.addProperty("httpMethod", requestToCache.getMethod());
+        jsonObject.addProperty("httpMethod",httpMethod);
         jsonObject.addProperty("clientIP", requestToCache.getRemoteAddr());
         jsonObject.addProperty("javaMethod", handler.toString());
         jsonObject.addProperty("queryString", requestToCache.getQueryString());
@@ -59,6 +60,7 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
         while (headerNames.hasMoreElements()) {
             String key = (String) headerNames.nextElement();
             String value = requestToCache.getHeader(key);
+            //Filter any sensitive information from being sent to logs
             if(key.equalsIgnoreCase("JSESSIONID")) {
             	jsonObject.addProperty(key,"");
             }
@@ -73,8 +75,13 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
             String value = requestToCache.getParameter(key);
             jsonObject.addProperty(key,value);
         }
-        
-        
+        if (!httpMethod.equalsIgnoreCase("GET")) {
+        	try {
+				jsonObject.addProperty("requestBody",getBody(requestToCache));
+			} catch (IOException e) {
+				logger.error(e.getStackTrace().toString());
+			}
+        }
         logger.info(jsonObject.toString());
     }
 
@@ -102,4 +109,37 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
         responseWrapper.copyBodyToResponse();
     }    
     
+    public static String getBody(HttpServletRequest request) throws IOException {
+
+        String body = null;
+        StringBuilder stringBuilder = new StringBuilder();
+        BufferedReader bufferedReader = null;
+
+        try {
+            InputStream inputStream = request.getInputStream();
+            if (inputStream != null) {
+                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                char[] charBuffer = new char[128];
+                int bytesRead = -1;
+                while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
+                    stringBuilder.append(charBuffer, 0, bytesRead);
+                }
+            } else {
+                stringBuilder.append("");
+            }
+        } catch (IOException ex) {
+            throw ex;
+        } finally {
+            if (bufferedReader != null) {
+                try {
+                    bufferedReader.close();
+                } catch (IOException ex) {
+                    throw ex;
+                }
+            }
+        }
+
+        body = stringBuilder.toString();
+        return body;
+    }
 }
