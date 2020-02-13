@@ -1,15 +1,13 @@
 package com.rohitsalecha.springular.devops.interceptor;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.DispatcherServlet;
@@ -18,7 +16,6 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 import org.springframework.web.util.WebUtils;
 
-import com.google.gson.JsonObject;
 
 //https://stackoverflow.com/a/39207422
 public class LoggableDispatcherServlet extends DispatcherServlet {
@@ -46,15 +43,15 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
     }
     
     private void log(HttpServletRequest requestToCache, HttpServletResponse responseToCache, HandlerExecutionChain handler) {
-        JsonObject jsonObject = new JsonObject();
+    	JSONObject jsonObject = new JSONObject(); 
         int status = responseToCache.getStatus();
         String httpMethod = requestToCache.getMethod();
-        jsonObject.addProperty("httpStatus",status);
-        jsonObject.addProperty("path", requestToCache.getRequestURI());
-        jsonObject.addProperty("httpMethod",httpMethod);
-        jsonObject.addProperty("clientIP", requestToCache.getRemoteAddr());
-        jsonObject.addProperty("javaMethod", handler.toString());
-        jsonObject.addProperty("queryString", requestToCache.getQueryString());
+        jsonObject.append("httpStatus",status);
+        jsonObject.append("path", requestToCache.getRequestURI());
+        jsonObject.append("httpMethod",httpMethod);
+        jsonObject.append("clientIP", requestToCache.getRemoteAddr());
+        jsonObject.append("javaMethod", handler.toString());
+        jsonObject.append("queryString", requestToCache.getQueryString());
         
         Enumeration<String> headerNames = requestToCache.getHeaderNames();
         while (headerNames.hasMoreElements()) {
@@ -62,10 +59,10 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
             String value = requestToCache.getHeader(key);
             //Filter any sensitive information from being sent to logs
             if(key.equalsIgnoreCase("JSESSIONID")) {
-            	jsonObject.addProperty(key,"");
+            	jsonObject.append(key,"");
             }
             else {
-                jsonObject.addProperty(key,value);
+                jsonObject.append(key,value);
             }
         }
         
@@ -73,11 +70,12 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
         while (parameterNames.hasMoreElements()) {
             String key = (String) parameterNames.nextElement();
             String value = requestToCache.getParameter(key);
-            jsonObject.addProperty(key,value);
+            jsonObject.append(key,value);
         }
         if (!httpMethod.equalsIgnoreCase("GET")) {
         	try {
-				jsonObject.add("requestBody",jsonObject.getAsJsonObject(getBody(requestToCache)));
+        		String requestBody = requestToCache.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+	        	jsonObject. append("postRequest",requestBody);
 			} catch (IOException e) {
 				logger.error(e.getStackTrace().toString());
 			}
@@ -85,23 +83,6 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
         logger.info(jsonObject.toString());
     }
 
-    private String getResponsePayload(HttpServletResponse response) {
-        ContentCachingResponseWrapper wrapper = WebUtils.getNativeResponse(response, ContentCachingResponseWrapper.class);
-        if (wrapper != null) {
-
-            byte[] buf = wrapper.getContentAsByteArray();
-            if (buf.length > 0) {
-                int length = Math.min(buf.length, 5120);
-                try {
-                    return new String(buf, 0, length, wrapper.getCharacterEncoding());
-                }
-                catch (UnsupportedEncodingException ex) {
-        			logger.error(ex.getStackTrace().toString());
-                }
-            }
-        }
-        return "[unknown]";
-    }
 
     private void updateResponse(HttpServletResponse response) throws IOException {
         ContentCachingResponseWrapper responseWrapper =
@@ -109,18 +90,4 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
         responseWrapper.copyBodyToResponse();
     }    
     
-    public String getBody(HttpServletRequest request) throws IOException {
-
-    	StringBuilder jsonBuff = new StringBuilder();
-    	String line = null;
-    	try {
-    	    BufferedReader reader = request.getReader();
-    	    while ((line = reader.readLine()) != null)
-    	        jsonBuff.append(line);
-    	} catch (Exception e) { 
-			logger.error(e.getStackTrace().toString());
-    	}
-    	logger.info(jsonBuff.toString());
-    	return jsonBuff.toString();
-    }
 }
