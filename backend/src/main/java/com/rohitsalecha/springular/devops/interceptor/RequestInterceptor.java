@@ -23,6 +23,8 @@ public class RequestInterceptor implements HandlerInterceptor{
     }
     
     private void log(HttpServletRequest requestToCache, HttpServletResponse responseToCache) {
+    	System.out.println("Inside Interceptor");
+    	logger.info("Inside Interceptor");
         int status = responseToCache.getStatus();
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("httpStatus", status);

@@ -16,3 +16,4 @@ ubuntu-bionic-18.04-cloudimg-console.log
 resources/static/
 logs/
 *.bak
+*.log

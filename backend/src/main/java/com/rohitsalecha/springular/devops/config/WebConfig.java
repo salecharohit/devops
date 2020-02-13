@@ -1,18 +1,29 @@
 package com.rohitsalecha.springular.devops.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.rohitsalecha.springular.devops.interceptor.RequestInterceptor;
+import com.rohitsalecha.springular.devops.interceptor.LoggableDispatcherServlet;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer  {
-	@Autowired
-	private RequestInterceptor requestInterceptor;
+//	@Autowired
+//	private RequestInterceptor requestInterceptor;
 	
-    public void addInterceptors(InterceptorRegistry registry){
-        registry.addInterceptor(requestInterceptor).addPathPatterns("/**");
+//    public void addInterceptors(InterceptorRegistry registry){
+//        registry.addInterceptor(requestInterceptor).addPathPatterns("*/**");
+//    }
+    @Bean
+    public ServletRegistrationBean dispatcherRegistration() {
+        return new ServletRegistrationBean(dispatcherServlet());
+    }
+
+    @Bean(name = DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
+    public DispatcherServlet dispatcherServlet() {
+        return new LoggableDispatcherServlet();
     }
 }
