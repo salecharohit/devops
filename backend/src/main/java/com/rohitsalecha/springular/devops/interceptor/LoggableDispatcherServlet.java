@@ -120,6 +120,7 @@ public class LoggableDispatcherServlet extends DispatcherServlet {
     	} catch (Exception e) { 
 			logger.error(e.getStackTrace().toString());
     	}
+    	logger.info(jsonBuff.toString());
     	return jsonBuff.toString();
     }
 }
