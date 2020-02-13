@@ -1,6 +1,5 @@
 package com.rohitsalecha.springular.devops.interceptor;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.stream.Collectors;
@@ -64,20 +63,13 @@ public class RequestResponseLoggingFilter implements Filter {
         }
         if (!httpMethod.equalsIgnoreCase("GET")) {
         	try {
-        		String line = null;
-        		StringBuilder jsonBuff = new StringBuilder();
-        	    BufferedReader reader = req.getReader();
-        	    while ((line = reader.readLine()) != null)
-        	        jsonBuff.append(line);
-//        		String  requestBody = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-	        	jsonObject. addProperty("postRequest",jsonBuff.toString());
+        		String  requestBody = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+	        	jsonObject. addProperty("data",requestBody);
 			} catch (IOException e) {
 				logger.error(e.getStackTrace().toString());
 			}
         }
         logger.info(jsonObject.toString());
-
-        
         
         chain.doFilter(request, response);
 		

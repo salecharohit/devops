@@ -8,18 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.rohitsalecha.springular.devops.interceptor.RequestResponseLoggingFilter;
 
 @Configuration
-public class WebConfig implements WebMvcConfigurer  {
-
-//    @Bean
-//    public ServletRegistrationBean dispatcherRegistration() {
-//        return new ServletRegistrationBean(dispatcherServlet());
-//    }
-//
-//    @Bean(name = DispatcherServletAutoConfiguration.DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
-//    public DispatcherServlet dispatcherServlet() {
-//        return new LoggableDispatcherServlet();
-//    }
-	
+public class WebConfig implements WebMvcConfigurer  {	
 	
 	@Bean
 	public FilterRegistrationBean<RequestResponseLoggingFilter> loggingFilter(){
