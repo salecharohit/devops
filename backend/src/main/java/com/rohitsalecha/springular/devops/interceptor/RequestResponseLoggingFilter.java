@@ -14,11 +14,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonObject;
 
 @Component
+@Order(1)
 public class RequestResponseLoggingFilter implements Filter {
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
