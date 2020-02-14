@@ -20,29 +20,7 @@
 			<fileNamePattern>springular.%d{yyyy-MM-dd}.log</fileNamePattern>
 			<maxHistory>7</maxHistory>
 		</rollingPolicy>
-		<encoder class="net.logstash.logback.encoder.LogstashEncoder">
-		<providers>
-			<timestamp>
-				<fieldName>ts</fieldName>
-				<timeZone>UTC</timeZone>
-			</timestamp>
-			<loggerName/>			
-			<message/>             
-			<stackHash>
-			    <fieldName>exception-hash</fieldName>
-			</stackHash>
-			<stackTrace>
-			    <fieldName>exception</fieldName>
-			    <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
-			        <shortenedClassNameLength>short</shortenedClassNameLength>
-			        <maxDepthPerThrowable>short</maxDepthPerThrowable>
-			        <maxLength>short</maxLength>
-			        <rootCauseFirst>true</rootCauseFirst>
-			        <exclude>sun\.reflect\..*\.invoke.*</exclude>
-			    </throwableConverter>
-			</stackTrace>
-		</providers>			
-		</encoder>
+		<encoder class="net.logstash.logback.encoder.LogstashEncoder" />
 	</appender>
 
 	<!-- LOG everything at INFO level -->
