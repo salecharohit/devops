@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import com.google.gson.JsonObject;
 
@@ -31,21 +32,22 @@ public class RequestResponseLoggingFilter implements Filter {
 
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;		
+        HttpServletRequest cachedRequest = new ContentCachingRequestWrapper(req);
 		
     	JsonObject jsonObject = new JsonObject(); 
         int status = res.getStatus();
-        String httpMethod = req.getMethod();
+        String httpMethod = cachedRequest.getMethod();
         jsonObject.addProperty("httpStatus",status);
-        jsonObject.addProperty("path", req.getRequestURI());
+        jsonObject.addProperty("path", cachedRequest.getRequestURI());
         jsonObject.addProperty("httpMethod",httpMethod);
-        jsonObject.addProperty("clientIP", req.getRemoteAddr());
-        jsonObject.addProperty("javaMethod", req.toString());
-        jsonObject.addProperty("queryString", req.getQueryString());
+        jsonObject.addProperty("clientIP", cachedRequest.getRemoteAddr());
+        jsonObject.addProperty("javaMethod", cachedRequest.toString());
+        jsonObject.addProperty("queryString", cachedRequest.getQueryString());
         
-        Enumeration<String> headerNames = req.getHeaderNames();
+        Enumeration<String> headerNames = cachedRequest.getHeaderNames();
         while (headerNames.hasMoreElements()) {
             String key = (String) headerNames.nextElement();
-            String value = req.getHeader(key);
+            String value = cachedRequest.getHeader(key);
             //Filter any sensitive information from being sent to logs
             if(key.equalsIgnoreCase("JSESSIONID")) {
             	jsonObject.addProperty(key,"");
@@ -55,15 +57,15 @@ public class RequestResponseLoggingFilter implements Filter {
             }
         }
         
-        Enumeration<String> parameterNames = req.getParameterNames();
+        Enumeration<String> parameterNames = cachedRequest.getParameterNames();
         while (parameterNames.hasMoreElements()) {
             String key = (String) parameterNames.nextElement();
-            String value = req.getParameter(key);
+            String value = cachedRequest.getParameter(key);
             jsonObject.addProperty(key,value);
         }
         if (!httpMethod.equalsIgnoreCase("GET")) {
         	try {
-        		String  requestBody = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+        		String  requestBody = cachedRequest.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
 	        	jsonObject. addProperty("data",requestBody);
 			} catch (IOException e) {
 				logger.error(e.getStackTrace().toString());
