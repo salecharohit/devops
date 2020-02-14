@@ -8,11 +8,22 @@ input
     }
 }
 filter {
-   if [tags][json] {
-      json {
-        source => "message"
-      }
-    }
+
+  if [message] =~ "\A\{.+\}\z" {
+        json {
+          source => "message"
+          target => "parsed_json"
+        }
+      mutate {
+          remove_field => [ "json", "message" ]
+        }
+  }
+        mutate {    
+          remove_field => [ "json", "agent" ]
+          remove_field => [ "json", "tags" ]
+          remove_field => [ "json", "thread_name" ]
+        }
+
  }
 output {
    # stdout { codec => rubydebug }
