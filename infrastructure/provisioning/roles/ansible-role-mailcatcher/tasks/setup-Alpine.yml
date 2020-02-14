@@ -31,10 +31,9 @@
     path: /etc/init.d/mailcatcher
   register: mailcatcher_file_exists
 
-- name: Starting and Enabling mailcatcher service
-  service:
-    name: mailcatcher
-    state: started
-    enabled: yes     
-  become: yes
-  when: mailcatcher_file_exists.stat.exists == false  
+- name: Add Mailcatcher at boot time
+  command: rc-update add mailcatcher boot
+  when: mailcatcher_file_exists.stat.exists == false    
+
+- name: Start Mailcatcher service if not started
+  command: rc-service mailcatcher start
