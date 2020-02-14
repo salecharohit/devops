@@ -5,8 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.rohitsalecha.springular.devops.interceptor.RequestResponseLoggingFilter;
-
 @Configuration
 public class WebConfig implements WebMvcConfigurer  {	
 	
@@ -18,4 +16,6 @@ public class WebConfig implements WebMvcConfigurer  {
 	    registrationBean.addUrlPatterns("/*");
 	    return registrationBean;    
 	}
+	
+
 }
