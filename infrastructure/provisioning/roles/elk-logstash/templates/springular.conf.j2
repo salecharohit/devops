@@ -8,11 +8,11 @@ input
     }
 }
 filter {
-
+# Check if message is a JSON string if yes then parse it.
   if [message] =~ "\A\{.+\}\z" {
         json {
           source => "message"
-          target => "parsed_json"
+          target => "httpRequest"
         }
       mutate {
           remove_field => [ "json", "message" ]
@@ -26,6 +26,7 @@ filter {
 
  }
 output {
+   # For Debugging Purposes
    # stdout { codec => rubydebug }
    # file {
    #    path => "/home/vagrant/logstash.log"
