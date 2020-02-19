@@ -1,2 +1,2 @@
 # DevOps
-## A blog Series on doing DevOps
+## Supporting Code for DevOps
