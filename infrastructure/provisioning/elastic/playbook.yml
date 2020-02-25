@@ -8,6 +8,6 @@
     become: yes
   - role: infrastructure/provisioning/roles/elk-elasticsearch
     vars:
-      elasticsearch_server: elastic.local
+      elasticsearch_server: elastic.devops
       elasticsearch_server_port: 9200
     become: yes       

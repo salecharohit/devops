@@ -1,6 +1,6 @@
 {
     "/": {
-        "target": "http://staging.local:8080",
+        "target": "http://staging.devops:8080",
         "secure": false
     }
 }

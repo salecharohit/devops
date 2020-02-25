@@ -21,7 +21,7 @@ pipeline {
                 remote.name = 'staging'
                 remote.user = 'vagrant'
                 remote.allowAnyHosts = true
-                remote.host = 'staging.local'
+                remote.host = 'staging.devops'
                 remote.identityFile = '~/.ssh/staging.key'
                 sshCommand remote: remote, command: "docker --version"
             }
@@ -38,7 +38,7 @@ pipeline {
                 remote.name = 'production'
                 remote.user = 'vagrant'
                 remote.allowAnyHosts = true
-                remote.host = 'production.local'
+                remote.host = 'production.devops'
                 remote.identityFile = '~/.ssh/production.key'
                 sshCommand remote: remote, command: "docker --version"
             }

@@ -11,5 +11,5 @@ filebeat.inputs:
     - "/home/vagrant/logs/*.log"
 output.logstash:
   enabled: true
-  hosts: ["logstash.local:5000"]
+  hosts: ["logstash.devops:5000"]
   ssl.enabled: false

@@ -1,5 +1,5 @@
 ---
-docker_insecure_registry_domain: "registry.local:5000"
+docker_insecure_registry_domain: "registry.devops:5000"
 # Jenkins Email Settings
 jenkins_email_suffix: "@mail"
 jenkins_reply_to_email: "user@domain.com"

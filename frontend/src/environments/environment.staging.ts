@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://staging.local/api'
+  apiUrl: 'http://staging.devops/api'
 };

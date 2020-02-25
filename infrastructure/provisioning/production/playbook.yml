@@ -5,7 +5,7 @@
   become: yes
   
   vars:
-    docker_insecure_registry_domain: "registry.local:5000"
+    docker_insecure_registry_domain: "registry.devops:5000"
 
   tasks:
 
@@ -45,4 +45,4 @@
     - role: infrastructure/provisioning/roles/elk-filebeat
       vars:
         log_file_locations: ["/home/vagrant/logs/*.log"]
-        logstash_server: "logstash.local:5000"        
+        logstash_server: "logstash.devops:5000"        

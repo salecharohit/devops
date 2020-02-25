@@ -35,7 +35,7 @@
 
 - name: Copy Private SSH Key of Staging Server for SSH Access
   copy:
-    src: /vagrant/.vagrant/machines/staging.local/virtualbox/private_key
+    src: /vagrant/.vagrant/machines/staging.devops/virtualbox/private_key
     dest: "{{jenkins_home}}/.ssh/staging.key"
     owner: "{{ jenkins_process_user }}"
     group: "{{ jenkins_process_group }}"
@@ -44,7 +44,7 @@
 
 - name: Copy Private SSH Key of Production Server for SSH Access
   copy:
-    src: /vagrant/.vagrant/machines/production.local/virtualbox/private_key
+    src: /vagrant/.vagrant/machines/production.devops/virtualbox/private_key
     dest: "{{jenkins_home}}/.ssh/production.key"
     owner: "{{ jenkins_process_user }}"
     group: "{{ jenkins_process_group }}"
@@ -53,7 +53,7 @@
 
 - name: Copy Private SSH Key of Archiver Server for SSH Access
   copy:
-    src: /vagrant/.vagrant/machines/archiver.local/virtualbox/private_key
+    src: /vagrant/.vagrant/machines/archiver.devops/virtualbox/private_key
     dest: "{{jenkins_home}}/.ssh/archiver.key"
     owner: "{{ jenkins_process_user }}"
     group: "{{ jenkins_process_group }}"

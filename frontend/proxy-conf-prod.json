@@ -1,6 +1,6 @@
 {
     "/": {
-        "target": "http://production.local:8080",
+        "target": "http://production.devops:8080",
         "secure": false
     }
 }
