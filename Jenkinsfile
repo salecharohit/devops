@@ -1,12 +1,12 @@
 pipeline {
    agent any
    environment {
-     DOCKER_REGISTRY = "registry.local:5000"
-     VAULT_ADDR = "http://vault.local:8200"
+     DOCKER_REGISTRY = "registry.devops:5000"
+     VAULT_ADDR = "http://vault.devops:8200"
      VAULT_PATH_MYSQL="kv/mysql/db"
-     VAULT_TOKEN_MYSQL="s.S8UUIhAm8L27TAXA62hTsyZf"
-     MYSQL_STAGING_URL="staging.local:3306"
-     MYSQL_PROD_URL="production.local:3306"
+     VAULT_TOKEN_MYSQL="s.tBmOunha9t9zWADvgyo4i3sL"
+     MYSQL_STAGING_URL="staging.devops:3306"
+     MYSQL_PROD_URL="production.devops:3306"
      MYSQL_DB_NAME="test"
      MYSQL_DB_PASSWORD="test"
      MYSQL_DB_USER="test"
@@ -34,7 +34,7 @@ pipeline {
                      remote.name = 'archiver'
                      remote.user = 'vagrant'
                      remote.allowAnyHosts = true
-                     remote.host = 'archiver.local'
+                     remote.host = 'archiver.devops'
                      remote.identityFile = '~/.ssh/archiver.key'
                      sshPut remote: remote, filterRegex: '.tar.gz$',from: '.' ,into: '/home/vagrant/archiver/frontend'
                   }
@@ -48,7 +48,7 @@ pipeline {
                      remote.name = 'archiver'
                      remote.user = 'vagrant'
                      remote.allowAnyHosts = true
-                     remote.host = 'archiver.local'
+                     remote.host = 'archiver.devops'
                      remote.identityFile = '~/.ssh/archiver.key'
                      sshPut remote: remote, filterRegex: '.jar$',from: './backend/target' ,into: '/home/vagrant/archiver/backend'
                   }
@@ -86,7 +86,7 @@ pipeline {
                               remote.name = 'staging'
                               remote.user = 'vagrant'
                               remote.allowAnyHosts = true
-                              remote.host = 'staging.local'
+                              remote.host = 'staging.devops'
                               remote.identityFile = '~/.ssh/staging.key'
                               sshCommand remote: remote, command: "docker stop mysqldb backend frontend || true"
                               sshCommand remote: remote, command: "docker rm backend mysqldb frontend || true"
@@ -111,7 +111,7 @@ pipeline {
                 remote.name = 'staging'
                 remote.user = 'vagrant'
                 remote.allowAnyHosts = true
-                remote.host = 'staging.local'
+                remote.host = 'staging.devops'
                 remote.identityFile = '~/.ssh/staging.key'
                 sshCommand remote: remote, command: "docker run -d -p 8080:8080 --link mysqldb -e MYSQL_DB_USER=${MYSQL_DB_USER} \
                 -e MYSQL_DB_PASSWORD=${MYSQL_DB_PASSWORD} -e MYSQL_JDBC_URL=${MYSQL_STAGING_URL} -e MYSQL_DB_NAME=${MYSQL_DB_NAME} \
@@ -157,7 +157,7 @@ pipeline {
                         remote.name = 'production'
                         remote.user = 'vagrant'
                         remote.allowAnyHosts = true
-                        remote.host = 'production.local'
+                        remote.host = 'production.devops'
                         remote.identityFile = '~/.ssh/production.key'
                         sshCommand remote: remote, command: "docker stop mysqldb backend frontend || true"
                         sshCommand remote: remote, command: "docker rm backend mysqldb frontend || true"
@@ -188,7 +188,7 @@ pipeline {
                 remote.name = 'production'
                 remote.user = 'vagrant'
                 remote.allowAnyHosts = true
-                remote.host = 'production.local'
+                remote.host = 'production.devops'
                 remote.identityFile = '~/.ssh/production.key'
                 sshCommand remote: remote, command: "docker run -d -p 8080:8080 --link mysqldb \
                    -e VAULT_TOKEN_MYSQL=${VAULT_TOKEN_MYSQL} -e MYSQL_DB_NAME=${MYSQL_DB_NAME} \
