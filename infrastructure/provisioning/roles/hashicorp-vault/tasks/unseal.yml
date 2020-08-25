@@ -7,6 +7,9 @@
   copy:
     dest: "{{ vault_config_directory }}/unseal_key_{{ item.0 }}"
     content: "{{ item.1 }}"
+    owner: root
+    group: root
+    mode: "655"    
   with_indexed_items: "{{ vault_init_parsed.unseal_keys_hex }}"
   delegate_to: localhost
   become: yes 
@@ -16,6 +19,9 @@
   copy:
     content: "{{ vault_init_parsed.root_token }}"
     dest: "{{vault_config_directory}}/rootkey"
+    owner: root
+    group: root
+    mode: "655"
   delegate_to: localhost
   become: yes 
   when: stat_result.stat.exists == False 
@@ -24,6 +30,9 @@
   copy:
     content: "{{ vault_init_parsed.root_token }}"
     dest: "{{vault_config_directory}}/rootkey"
+    owner: root
+    group: root
+    mode: "655"    
   become: yes 
   when: stat_result.stat.exists == False 
 
@@ -34,7 +43,7 @@
     dest: /etc/profile.d/
     owner: root
     group: root
-    mode: a+x
+    mode: "655"
   become: yes
   when: stat_result.stat.exists == False
        
