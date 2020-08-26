@@ -11,3 +11,14 @@ I've created this DevOps lab to explain the following terms through separate blo
 
 ## Ubuntu 18.04 distro environment on Windows
 https://kiazhi.github.io/blog/The-easy-way-to-get-Ubuntu-18.04-distro-environment-on-Windows/
+
+# For Testing 
+vagrant destroy vault.devops -f
+vagrant up vault.devops
+
+VAULT_TOKEN_MYSQL = MYSQL_ROOT_POLICY_TOKEN
+TASK [Spooling MYSQL_ROOT_POLICY_TOKEN Vault Tokens] ***************************
+ok: [vault.devops] => {"ansible_facts": {"MYSQL_ROOT_POLICY_TOKEN": "s.BrFHZoIpodIvalzYFuyTxzh6"}, "changed": false}
+
+TASK [Spooling MYSQL_DB_POLICY_TOKEN Vault Tokens] *****************************
+ok: [vault.devops] => {"ansible_facts": {"MYSQL_DB_POLICY_TOKEN": "s.fq8SdoWAzDxZfQ87IPDdjxFk"}, "changed": false}
