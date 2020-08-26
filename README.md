@@ -16,9 +16,8 @@ https://kiazhi.github.io/blog/The-easy-way-to-get-Ubuntu-18.04-distro-environmen
 vagrant destroy vault.devops -f
 vagrant up vault.devops
 
-VAULT_TOKEN_MYSQL = MYSQL_ROOT_POLICY_TOKEN
 TASK [Spooling MYSQL_ROOT_POLICY_TOKEN Vault Tokens] ***************************
-ok: [vault.devops] => {"ansible_facts": {"MYSQL_ROOT_POLICY_TOKEN": "s.BrFHZoIpodIvalzYFuyTxzh6"}, "changed": false}
+ok: [vault.devops] => {"ansible_facts": {"MYSQL_ROOT_POLICY_TOKEN": "s.Wzq7IUXmgmCVfUbpEj92GFiy"}, "changed": false}
 
 TASK [Spooling MYSQL_DB_POLICY_TOKEN Vault Tokens] *****************************
-ok: [vault.devops] => {"ansible_facts": {"MYSQL_DB_POLICY_TOKEN": "s.fq8SdoWAzDxZfQ87IPDdjxFk"}, "changed": false}
+ok: [vault.devops] => {"ansible_facts": {"MYSQL_DB_POLICY_TOKEN": "s.E6WxeDlyHOkJcDDrgE0E39fu"}, "changed": false}
