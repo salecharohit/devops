@@ -26,10 +26,16 @@
   template:
     src: logstash.yml
     dest: "/etc/logstash/logstash.yml"
+    owner: root
+    group: root
+    mode: "655" 
 
 - name: Copy the springular.conf file
   template:
     src: springular.conf.j2
     dest: "/etc/logstash/conf.d/springular.conf"
+    owner: root
+    group: root
+    mode: "655" 
   notify: Restart Logstash
 
