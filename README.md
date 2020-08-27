@@ -8,3 +8,6 @@ I've created this DevOps lab to explain the following terms through separate blo
 
 # Setup Instructions
 [Set up Instructions](https://www.rohitsalecha.com/project/practical_devops/)
+
+## Ubuntu 18.04 distro environment on Windows
+https://kiazhi.github.io/blog/The-easy-way-to-get-Ubuntu-18.04-distro-environment-on-Windows/
