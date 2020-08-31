@@ -8,9 +8,6 @@ pipeline {
      MYSQL_STAGING_URL="staging.devops:3306"
      MYSQL_PROD_URL="production.devops:3306"
      MYSQL_DB_NAME="test"
-     MYSQL_DB_PASSWORD="test"
-     MYSQL_DB_USER="test"
-     MYSQL_DB_ROOT="tooor"
    }
    stages {
       stage('Build') {
@@ -80,23 +77,25 @@ pipeline {
                            '''
                         },
                   db:   { // Parallely start the MySQL Daemon in the staging server first stop if already running then start
-                  
-                           script {
-                              def remote = [:]
-                              remote.name = 'staging'
-                              remote.user = 'vagrant'
-                              remote.allowAnyHosts = true
-                              remote.host = 'staging.devops'
-                              remote.identityFile = '~/.ssh/staging.key'
-                              sshCommand remote: remote, command: "docker stop mysqldb backend frontend || true"
-                              sshCommand remote: remote, command: "docker rm backend mysqldb frontend || true"
-                              sshCommand remote: remote, command: "docker rmi ${DOCKER_REGISTRY}/devops/api:staging ${DOCKER_REGISTRY}/devops/ui:staging || true"
-                              sshCommand remote: remote, command: "docker run -d -p 3306:3306 \
-                              -e MYSQL_DATABASE=${MYSQL_DB_NAME} -e MYSQL_ROOT_PASSWORD=${MYSQL_DB_ROOT} -e MYSQL_USER=${MYSQL_DB_USER} -e MYSQL_PASSWORD=${MYSQL_DB_PASSWORD} \
-                              -v /home/vagrant/mysql:/var/lib/mysql \
-                              --name mysqldb mysql \
-                              --default-authentication-plugin=mysql_native_password"
-                           }               
+                        withCredentials([string(credentialsId: 'mysqlroot', variable: 'mysqlroot'), 
+                                    string(credentialsId: 'mysqldbpw', variable: 'mysqldbpw')]){
+                              script {
+                                 def remote = [:]
+                                 remote.name = 'staging'
+                                 remote.user = 'vagrant'
+                                 remote.allowAnyHosts = true
+                                 remote.host = 'staging.devops'
+                                 remote.identityFile = '~/.ssh/staging.key'
+                                 sshCommand remote: remote, command: "docker stop mysqldb backend frontend || true"
+                                 sshCommand remote: remote, command: "docker rm backend mysqldb frontend || true"
+                                 sshCommand remote: remote, command: "docker rmi ${DOCKER_REGISTRY}/devops/api:staging ${DOCKER_REGISTRY}/devops/ui:staging || true"
+                                 sshCommand remote: remote, command: "docker run -d -p 3306:3306 \
+                                 -e MYSQL_DATABASE=${MYSQL_DB_NAME} -e MYSQL_ROOT_PASSWORD=${MYSQL_DB_ROOT} -e MYSQL_USER=${mysqlroot} -e MYSQL_PASSWORD=${mysqldbpw} \
+                                 -v /home/vagrant/mysql:/var/lib/mysql \
+                                 --name mysqldb mysql \
+                                 --default-authentication-plugin=mysql_native_password"
+                              }               
+                           }
                         }
                      )
                }
@@ -106,18 +105,21 @@ pipeline {
             sh '''
 		            sleep 5
                '''
-            script {
-                def remote = [:]
-                remote.name = 'staging'
-                remote.user = 'vagrant'
-                remote.allowAnyHosts = true
-                remote.host = 'staging.devops'
-                remote.identityFile = '~/.ssh/staging.key'
-                sshCommand remote: remote, command: "docker run -d -p 8080:8080 --link mysqldb -e MYSQL_DB_USER=${MYSQL_DB_USER} \
-                -e MYSQL_DB_PASSWORD=${MYSQL_DB_PASSWORD} -e MYSQL_JDBC_URL=${MYSQL_STAGING_URL} -e MYSQL_DB_NAME=${MYSQL_DB_NAME} \
-                -v /home/vagrant/logs:/home/boot/logs/ --name backend ${DOCKER_REGISTRY}/devops/api:staging"
-                sshCommand remote: remote, command: "docker run -d -p 80:80 --link backend \
-                  --name frontend ${DOCKER_REGISTRY}/devops/ui:staging"                  
+            withCredentials([string(credentialsId: 'mysqlroot', variable: 'mysqlroot'), 
+                                    string(credentialsId: 'mysqldbpw', variable: 'mysqldbpw')]){
+                  script {
+                     def remote = [:]
+                     remote.name = 'staging'
+                     remote.user = 'vagrant'
+                     remote.allowAnyHosts = true
+                     remote.host = 'staging.devops'
+                     remote.identityFile = '~/.ssh/staging.key'
+                     sshCommand remote: remote, command: "docker run -d -p 8080:8080 --link mysqldb -e MYSQL_DB_USER=${mysqlroot} \
+                     -e MYSQL_DB_PASSWORD=${mysqldbpw} -e MYSQL_JDBC_URL=${MYSQL_STAGING_URL} -e MYSQL_DB_NAME=${MYSQL_DB_NAME} \
+                     -v /home/vagrant/logs:/home/boot/logs/ --name backend ${DOCKER_REGISTRY}/devops/api:staging"
+                     sshCommand remote: remote, command: "docker run -d -p 80:80 --link backend \
+                     --name frontend ${DOCKER_REGISTRY}/devops/ui:staging"                                      
+                  }
             }
          }
       }
