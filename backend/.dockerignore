@@ -1,0 +1,16 @@
+# comment
+*/temp*
+*/*/temp*
+temp?
+.git
+.gitignore
+Dockerfile
+README.md
+docker-compose.yml
+/src
+.pom.xml
+/.git
+/.settings
+.classpath
+.project
+.springBeans
