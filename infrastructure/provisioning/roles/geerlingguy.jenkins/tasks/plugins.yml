@@ -27,7 +27,7 @@
     dest: "{{ jenkins_home }}/updates/default.json"
     owner: jenkins
     group: jenkins
-    mode: 0440
+    mode: 0644
   changed_when: false
   register: get_result
   until: get_result is success
@@ -57,5 +57,6 @@
   tags: ['skip_ansible_lint']
   register: plugin_result
   until: plugin_result is success
-  retries: 5
+  retries: 10
   delay: 2
+  
