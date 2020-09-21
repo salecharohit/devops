@@ -29,7 +29,7 @@
       vars: 
         # Jenkins 
         # https://github.com/geerlingguy/ansible-role-jenkins/issues/269
-        jenkins_version: "2.254"
+        jenkins_version: "2.257"
         jenkins_admin_username: jenkins
         jenkins_admin_password: jenkins
         jenkins_http_port: 8080
@@ -45,10 +45,10 @@
           - ansicolor
           - workflow-aggregator
           - email-ext
-          - blueocean
           - mailer
           - ssh-steps
           - monitoring
+          - blueocean
       
     - role: infrastructure/provisioning/roles/geerlingguy.docker
       become: yes
@@ -60,3 +60,8 @@
       vars:
         nodejs_version: "12.x"
         nodejs_npm_global_packages: ["rimraf","mkdirp","copyfiles"]
+    - role: infrastructure/provisioning/roles/geerlingguy.pip
+      become: yes
+      vars: 
+        pip_install_packages:
+        - name: docker-py 

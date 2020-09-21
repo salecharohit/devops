@@ -13,4 +13,4 @@ I've created this DevOps lab to explain the following terms through separate blo
 https://kiazhi.github.io/blog/The-easy-way-to-get-Ubuntu-18.04-distro-environment-on-Windows/
 
 # Contributors (Big Thanks!)
-- [Boriputh](https://github.com/boriphuth)
+- [Boriphuth](https://github.com/boriphuth)
