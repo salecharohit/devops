@@ -29,7 +29,7 @@
       vars: 
         # Jenkins 
         # https://github.com/geerlingguy/ansible-role-jenkins/issues/269
-        jenkins_version: "2.303.3"
+        jenkins_version: "2.303"
         jenkins_admin_username: jenkins
         jenkins_admin_password: jenkins
         jenkins_http_port: 8080
