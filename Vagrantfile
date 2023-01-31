@@ -33,6 +33,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box_check_update = false
   config.vbguest.auto_update = false
 
+  config.vm.synced_folder ".", "/vagrant", create: true
+  config.vm.boot_timeout = 1800
+
   hosts.each do |host|
     config.vm.define host['name'] do |node|
       node.vm.hostname = host['name']

@@ -1,0 +1,15 @@
+---
+- name: Stop jenkins
+  ansible.builtin.service:
+    name: jenkins
+    state: stopped
+
+- name: Download correct version of jenkins.war
+  ansible.builtin.get_url:
+    url: https://updates.jenkins.io/download/war/2.375.1/jenkins.war
+    dest: /usr/share/jenkins/jenkins.war
+
+- name: Stop jenkins
+  ansible.builtin.service:
+    name: jenkins
+    state: started 

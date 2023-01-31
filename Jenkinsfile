@@ -4,7 +4,7 @@ pipeline {
      DOCKER_REGISTRY = "registry.devops:5000"
      VAULT_ADDR = "http://vault.devops:8200"
      VAULT_PATH_MYSQL="kv/mysql/db"
-     VAULT_TOKEN_MYSQL="s.E6WxeDlyHOkJcDDrgE0E39fu"
+     VAULT_TOKEN_MYSQL="s.DOFPFXpgT6qFmMhwU98fpV9p"
      MYSQL_STAGING_URL="staging.devops:3306"
      MYSQL_PROD_URL="production.devops:3306"
      MYSQL_DB_NAME="test"
@@ -204,7 +204,7 @@ pipeline {
       }
     }
     always {
-      step([$class: 'Mailer', notifyEveryUnstableBuild: true,recipients: "build-failed@devops.local",sendToIndividuals: true])
+      step([$class: 'Mailer', notifyEveryUnstableBuild: true,recipients: "build@devops.local",sendToIndividuals: true])
       step([$class: 'WsCleanup'])
     }
   }

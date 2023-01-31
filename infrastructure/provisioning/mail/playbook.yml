@@ -1,8 +1,10 @@
 ---
-- name: Install Mailcatcher
+- name: Install Mailhog
   gather_facts: True
   hosts: all
 
   roles:
-  - role: infrastructure/provisioning/roles/ansible-role-mailcatcher
+  - role: infrastructure/provisioning/roles/geerlingguy.daemonize
+    become: yes
+  - role: infrastructure/provisioning/roles/ansible-role-mailhog
     become: yes

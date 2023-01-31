@@ -65,3 +65,13 @@
       vars: 
         pip_install_packages:
         - name: docker-py 
+
+- name: "Update jenkins to version 2.375.1"
+  hosts: all
+  # To run locally
+  #hosts: localhost
+  #connection: local
+  become: yes
+
+  tasks:
+    - import_tasks: update-jenkins.yml
