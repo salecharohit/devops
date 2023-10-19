@@ -20,3 +20,6 @@ https://kiazhi.github.io/blog/The-easy-way-to-get-Ubuntu-18.04-distro-environmen
 - This lab is a perfect play ground for those who wish to create a DevSecOps environment.
 - Reference implementations
   - [DevSecOps](https://github.com/amolnaik4/DevSecOps) by [Amol Naik](https://github.com/amolnaik4)
+
+ole los caracole
+ole ole
