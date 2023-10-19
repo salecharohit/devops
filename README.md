@@ -1,3 +1,6 @@
+ForkThePork
+MergeTheVerge
+
 # Practical DevOps - The Lab - Made by: me of course
 I've created this DevOps lab to explain the following terms through separate blogposts
 
